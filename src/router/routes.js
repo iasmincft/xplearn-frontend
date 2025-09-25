@@ -1,31 +1,31 @@
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/Layout.vue'),
+    component: () => import('src/layouts/MainLayout.vue'),
     children: [
       { 
         path: '', 
-        component: () => import('pages/Home.vue') 
+        component: () => import('src/pages/PageHome.vue') 
       },
       { 
-        path: '', 
-        component: () => import('pages/Atividades.vue') 
+        path: '/atividades', 
+        component: () => import('src/pages/PageAtividades.vue') 
       },
       { 
-        path: '', 
-        component: () => import('pages/Ranking.vue') 
+        path: '/ranking', 
+        component: () => import('src/pages/PageRanking.vue') 
       },
       { 
-        path: '', 
-        component: () => import('pages/Turmas.vue') 
+        path: '/turmas', 
+        component: () => import('src/pages/PageTurmas.vue') 
       },
       { 
-        path: '', 
-        component: () => import('pages/Badges.vue') 
+        path: '/badges', 
+        component: () => import('src/pages/PageBadges.vue') 
       },
       { 
-        path: '', 
-        component: () => import('pages/Settings.vue') 
+        path: '/settings', 
+        component: () => import('src/pages/PageSettings.vue') 
       }
     ]
   },

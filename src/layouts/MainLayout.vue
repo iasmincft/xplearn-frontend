@@ -2,7 +2,6 @@
   <q-layout view="lHh lpR lFf">
 
     <q-drawer 
-      show-if-above 
       bordered
       :width="250"
       :mini-width="60"
@@ -11,6 +10,8 @@
       @mouseleave="miniState = true"
       mini-to-overlay
       class="bg-dark"
+      show-if-above
+      :breakpoint="0" 
     >
       <q-list >
         <q-item style="height: 70px;" class="q-py-sm">
@@ -23,11 +24,12 @@
             <q-img
               src="icons/favicon-128x128.png"
               style="width: 38px;"
+              
             />
           </q-item-section>
 
           <q-item-section>
-            <q-item-label class="text-weight-bold">{{ headerTitle }}</q-item-label>
+            <q-item-label class="text-weight-bold text-white">{{ headerTitle }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -35,6 +37,7 @@
           v-for="link in linksList"
           :key="link.title"
           v-bind="link"
+          class="text-white"
         />
       </q-list>
     </q-drawer>

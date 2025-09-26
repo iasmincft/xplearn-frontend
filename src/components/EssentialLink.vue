@@ -2,7 +2,7 @@
   <q-item
     clickable
     tag="a"
-    :href="props.link"
+    :to="props.link"
   >
     <q-item-section
      v-if="props.icon"

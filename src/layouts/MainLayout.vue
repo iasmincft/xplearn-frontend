@@ -27,24 +27,30 @@
           :key="link.title"
           v-bind="link"
           :is-expanded="isExpanded"
-          exact
         />
       </q-list>
     </q-drawer>
 
     <q-page-container class="bg-dark text-white">
+      <div class="text-h4 q-pa-md q-ml-lg">
+        {{ pageTitle }}
+      </div>
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
     
 const isExpanded = ref(false)
 
 const headerTitle = 'XP Learn'
+const route = useRoute()
+const pageTitle = computed(() => route.meta.title || 'Página')
+
 
 const linksList = [
   {
@@ -77,15 +83,20 @@ const linksList = [
     icon: 'settings',
     link: '/settings',
   }
-  
 ]
 
 </script>
 
 <style lang="scss">
+
 .q-drawer {
-  transition: width 0.3s ease-in-out;
+  transition: width 0.35s ease;
 }
+
+.q-page-container {
+  transition: padding-left 0.35s ease;
+}
+
 .q-drawer__content {
   overflow-x: hidden;
 }
@@ -95,8 +106,9 @@ const linksList = [
 }
 .active-link {
   background-color: $dark !important;
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 10px !important;
 }
-
 
 </style>
 

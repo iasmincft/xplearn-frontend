@@ -5,27 +5,33 @@ const routes = [
     children: [
       { 
         path: 'home', 
-        component: () => import('src/pages/PageHome.vue') 
+        component: () => import('src/pages/PageHome.vue'),
+        meta: { title: 'Home' } 
       },
       { 
         path: '/atividades', 
-        component: () => import('src/pages/PageAtividades.vue') 
+        component: () => import('src/pages/PageAtividades.vue'),
+        meta: { title: 'Atividades' }
       },
       { 
         path: '/ranking', 
-        component: () => import('src/pages/PageRanking.vue') 
+        component: () => import('src/pages/PageRanking.vue'),
+        meta: { title: 'Ranking' }
       },
       { 
         path: '/turmas', 
-        component: () => import('src/pages/PageTurmas.vue') 
+        component: () => import('src/pages/PageTurmas.vue'),
+        meta: { title: 'Turmas' }
       },
       { 
         path: '/badges', 
-        component: () => import('src/pages/PageBadges.vue') 
+        component: () => import('src/pages/PageBadges.vue'),
+        meta: { title: 'Badges' }
       },
       { 
         path: '/settings', 
-        component: () => import('src/pages/PageSettings.vue') 
+        component: () => import('src/pages/PageSettings.vue'),
+        meta: { title: 'Settings' }
       }
     ]
   },

@@ -27,7 +27,7 @@
           
           <div class="q-mb-xl">
             <div class="text-h5 q-mb-md">Atividades</div>
-            <q-card flat class="bg-dark">
+            <q-card rounded class="bg-dark-page q-pa-sm " flat >
               <q-tabs
                 v-model="tabAtividades"
                 dense

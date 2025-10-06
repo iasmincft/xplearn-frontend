@@ -94,6 +94,8 @@ export default defineConfig((/* ctx */) => {
 
       // Quasar plugins
       plugins: [],
+
+      sassVariables: 'src/css/quasar.variables.scss'
     },
 
     // animations: 'all', // --- includes all animations

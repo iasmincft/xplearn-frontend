@@ -26,43 +26,20 @@
         <div class="col-12 col-md-7">
           
           <div class="q-mb-xl">
-            <div class="text-h5 q-mb-md">Atividades</div>
-            <q-card flat class="bg-dark">
-              <q-tabs
-                v-model="tabAtividades"
-                dense
-                class="text-grey"
-                active-color="primary"
-                indicator-color="primary"
-                align="justify"
-                narrow-indicator
-              >
-                <q-tab name="pendentes" label="Pendentes" />
-                <q-tab name="concluidas" label="Concluídas" />
-              </q-tabs>
-              <q-separator />
-              <q-tab-panels v-model="tabAtividades" animated class="bg-transparent">
-                <q-tab-panel name="pendentes">
-                  <q-list separator>
-                    <q-item v-for="atividade in atividadesPendentes" :key="atividade.titulo">
-                      <q-item-section avatar>
-                        <q-icon color="primary" name="assignment" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label>{{ atividade.titulo }}</q-item-label>
-                        <q-item-label caption class="text-grey-5">Entrega: {{ atividade.data }}</q-item-label>
-                      </q-item-section>
-                      <q-item-section side>
-                        <q-btn flat dense color="primary" label="Ver" />
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-tab-panel>
-                <q-tab-panel name="concluidas">
-                  <div class="text-center text-grey">Nenhuma atividade concluída ainda.</div>
-                </q-tab-panel>
-              </q-tab-panels>
+            <div class="text-h5 q-pt-lg q-mb-md">Atividades</div>
+            <q-card rounded class="bg-dark-page" flat >
+              <q-list>
+                <q-item>
+                  <q-item-section>
+                    Atividades Pendentes: 
+                  </q-item-section>
+                  <q-item-section>
+                    Atividades Completas:
+                  </q-item-section> 
+                </q-item>
+              </q-list>
             </q-card>
+            
           </div>
 
           <div>
@@ -77,7 +54,7 @@
 
         <div class="col-12 col-md-5">
 
-          <div class="text-h5 q-mb-md">Ranking da Turma</div>
+          <div class="text-h5 q-pt-lg q-mb-md">Ranking da Turma</div>
           <q-table
             :rows="rankingRows"
             :columns="rankingColumns"
@@ -111,13 +88,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import PageAtividades from './PageAtividades.vue'
 
 // Dados para a aba de atividades
-const tabAtividades = ref('pendentes')
-const atividadesPendentes = ref([
-  { titulo: 'Lista de Exercícios 1', data: '30/09/2025' },
-  { titulo: 'Apresentação em Grupo', data: '08/10/2025' },
-])
 
 // Dados para a tabela de ranking
 const rankingColumns = [

@@ -30,12 +30,15 @@
             <q-card rounded class="bg-dark-page" flat >
               <q-list>
                 <q-item>
-                  <q-item-section>
-                    Atividades Pendentes: 
-                  </q-item-section>
-                  <q-item-section>
-                    Atividades Completas:
-                  </q-item-section> 
+                  <q-chip>
+                    Atividades Pendentes:
+                    <q-avatar class="align-end" color="secondary" text-color="white">50</q-avatar>
+                  </q-chip>
+                  <
+                  <q-chip>
+                    Atividades Pendentes:
+                    <q-avatar class="align-end" color="secondary" text-color="white">50</q-avatar>
+                  </q-chip>
                 </q-item>
               </q-list>
             </q-card>
@@ -88,9 +91,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import PageAtividades from './PageAtividades.vue'
 
-// Dados para a aba de atividades
 
 // Dados para a tabela de ranking
 const rankingColumns = [

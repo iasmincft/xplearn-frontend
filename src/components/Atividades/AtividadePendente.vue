@@ -3,8 +3,11 @@
 
         <div v-if="atividadesStore.atividadesPendentes.length">
 
-            <AtividadeItem v-for="atividade in atividadesStore.atividadesPendentes" :key="atividade.id"
-                :atividade="atividade" @toggle-atividade="atividadesStore.alternarConcluida" />
+            <AtividadeItem 
+                v-for="atividade in atividadesStore.atividadesPendentes" 
+                :key="atividade.id"
+                :atividade="atividade" 
+                @toggle-atividade="atividadesStore.alternarConcluida" />
 
         </div>
 

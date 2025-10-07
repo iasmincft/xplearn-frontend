@@ -25,32 +25,46 @@
 
         <div class="col-12 col-md-7">
           
-          <div class="q-mb-xl">
+          <div class="q-mb-xl" style="width: fit-content;">
             <div class="text-h5 q-pt-lg q-mb-md">Atividades</div>
-            <q-card rounded class="bg-dark-page" flat >
-              <q-list>
-                <q-item>
-                  <q-chip>
-                    Atividades Pendentes:
-                    <q-avatar class="align-end" color="secondary" text-color="white">50</q-avatar>
-                  </q-chip>
-                  <
-                  <q-chip>
-                    Atividades Pendentes:
-                    <q-avatar class="align-end" color="secondary" text-color="white">50</q-avatar>
-                  </q-chip>
-                </q-item>
-              </q-list>
-            </q-card>
-            
-          </div>
-
-          <div>
+              <q-card rounded class="bg-dark-page q-pa-sm" style="width: fit-content;" flat >
+                <q-list>
+                  <q-item class="bgdark">
+                    <q-chip class="bg-dark text-white" style="width: 190px;">
+                      <span class="q-pr-lg ">Atividades Pendentes:</span>
+                      <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
+                        2
+                      </q-avatar>
+                    </q-chip>
+                  </q-item>
+                  <q-item>
+                    <q-chip class="bg-dark text-white" style="width: 190px;">
+                      <span class="q-pr-lg ">Atividades Concluídas:</span>
+                      <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
+                        0
+                      </q-avatar>
+                    </q-chip>
+                  </q-item>
+                </q-list>
+              </q-card>
+            </div>
+          <div style="width: fit-content;">
             <div class="text-h5 q-mb-md">Badges</div>
             <div class="row q-gutter-md">
-              <q-avatar v-for="badge in badges" :key="badge.nome" size="90px" :icon="badge.icon" :color="badge.cor" text-color="white" :style="{ opacity: badge.conquistado ? 1 : 0.4 }">
-                <q-tooltip>{{ badge.nome }}</q-tooltip>
-              </q-avatar>
+               <div
+                v-for="index in slotsVisiveis"
+                :key="`home-slot-${index}`"
+              >
+                <q-avatar size="90px">
+                  <q-img
+                    :src="badgeStore.items[index - 1] ? badgeStore.items[index - 1].badge : emptySlotImage"
+                  >
+                    <q-tooltip>
+                      {{ badgeStore.items[index - 1] ? badgeStore.items[index - 1].nome : 'Slot Vazio' }}
+                    </q-tooltip>
+                  </q-img>
+                </q-avatar>
+              </div>
             </div>
           </div>
         </div>
@@ -91,7 +105,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useBadgeStore } from 'src/stores/badgeStore';
 
+const badgeStore = useBadgeStore();
+
+const slotsVisiveis = 5;
+const emptySlotImage = 'public/emptyBadgeSlot.png';
 
 // Dados para a tabela de ranking
 const rankingColumns = [
@@ -107,14 +126,6 @@ const rankingRows = ref([
   { pos: '10º', aluno: 'Jane Doe (Voce)', nivel: 'X', chipColor: 'transparent' },
 ])
 
-// Dados para os badges
-const badges = ref([
-  { nome: 'Mestre dos Algoritmos', icon: 'hub', cor: 'purple-6', conquistado: true },
-  { nome: 'Arquiteto de Redes', icon: 'lan', cor: 'indigo-6', conquistado: true },
-  { nome: 'Caçador de Bugs', icon: 'bug_report', cor: 'red-6', conquistado: true },
-  { nome: 'Mestre do Tempo', icon: 'hourglass_top', cor: 'cyan-6', conquistado: true },
-  { nome: 'Iniciante', icon: 'school', cor: 'blue-grey-8', conquistado: false },
-])
 
 </script>
 

@@ -31,8 +31,8 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container class="bg-dark text-white">
-      <div class="text-h4 q-pa-md q-ml-lg">
+    <q-page-container class="bg-dark text-white ">
+      <div class="text-h4 text-bold q-pa-md q-ml-lg">
         {{ pageTitle }}
       </div>
       <router-view />

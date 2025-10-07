@@ -9,7 +9,7 @@
       <q-item-section avatar>
         <q-icon color="primary" name="assignment" class="text-h5" />
       </q-item-section>
-
+      
       <q-item-section>
         <q-item-label>{{ atividade.titulo }}</q-item-label>
         <q-item-label caption class="text-grey-5">Entrega: {{ atividade.data }}</q-item-label>

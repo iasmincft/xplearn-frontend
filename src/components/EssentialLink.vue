@@ -38,7 +38,7 @@ const props = defineProps({
   },
   link: {
     type: String,
-    default: '#',
+    default: '/home',
   },
   icon: {
     type: String,

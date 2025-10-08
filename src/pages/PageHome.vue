@@ -63,9 +63,6 @@
           </div>
         </div>
 
-        
-        
-        
         <div class="col-7 col-md-5 col-sm-6">
           <div class="text-h5 q-pt-lg q-mb-md">
             Ranking da Turma

@@ -2,23 +2,22 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 
 export const useAtividadesStore = defineStore('atividades', {
   state: () => ({
-    items: JSON.parse(localStorage.getItem('atividades')) || {
-        1: { id: 1, titulo: 'Estudar Quasar', data: '10/09/2001', concluida: false },
-        2: { id: 2, titulo: 'Estudar Pinia', data: '10/09/2001', concluida: false },
-    },
+    items: JSON.parse(localStorage.getItem('atividades')) || [
+      { id: 1, titulo: 'Estudar Quasar', data: '10/09/2001', concluida: false },
+      { id: 2, titulo: 'Estudar Pinia', data: '10/09/2001', concluida: false },
+    ],
   }),
   getters: {
-    atividades: (state) => state.items,
     atividadesPendentes: (state) => {
-      return Object.values(state.items).filter(atividade => !atividade.concluida)
+      return state.items.filter(atividade => !atividade.concluida)
     },
     atividadesCompletas: (state) => {
-      return Object.values(state.items).filter(atividade => atividade.concluida)
+      return state.items.filter(atividade => atividade.concluida)
     }
   },
   actions: {
-    alternarConcluida(id) {
-      const atividade = this.items[id]
+    alternarConcluida(idParaAlternar) {
+      const atividade = this.items.find(item => item.id === idParaAlternar)
       if (atividade) {
         atividade.concluida = !atividade.concluida
         this.salvarNoLocalStorage()

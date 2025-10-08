@@ -2,9 +2,9 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 
 export const useBadgeStore = defineStore('badge', {
   state: () => ({
-    items: JSON.parse(localStorage.getItem('badge')) || {
-        0: { id: 1, nome: 'Mestre dos Algoritmos', badge: '/icons/iconxplearn.png' },
-    },
+    items: JSON.parse(localStorage.getItem('badge')) || [
+      { id: 1, nome: 'Mestre dos Algoritmos', badge: '/icons/iconxplearn.png' },
+    ],
   }),
   getters: {
     

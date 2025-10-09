@@ -12,12 +12,9 @@
               <div class="text-grey-5">@janedoe</div>
             </div>
             <q-space />
-            <SecaoNivelXP />
-            <!--<div class="col-xs-12 col-sm-4">
-              <div class="text-subtitle1">Nível X</div>
-              <q-linear-progress rounded size="15px" :value="0.75" color="primary" class="q-mt-sm" />
-              <div class="text-right text-caption text-grey-5 q-mt-xs">750/1000 XP</div>
-            </div>-->
+            <div class="col-xs-12 col-sm-5 q-pr-lg">
+              <SecaoNivelXP />
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -30,7 +27,8 @@
             <div class="text-h5 q-pt-xl q-mb-md">Atividades</div>
               <q-card rounded class="bg-dark-page q-pa-sm" style="width: fit-content;" flat >
                 <q-list>
-                  <router-link
+                  <router-link 
+                    style="text-decoration: none;"
                     :to="{ path: '/atividades', query: { tab: 'pendentes' } }"
                   >
                     <q-item class="bgdark">
@@ -43,6 +41,7 @@
                     </q-item>
                   </router-link>
                   <router-link
+                    style="text-decoration: none;"
                     :to="{ path: '/atividades', query: { tab: 'concluidas' } }"
                   >
                     <q-item>
@@ -60,7 +59,7 @@
           <div style="width: fit-content;">
             <div class="text-h5 q-mb-md q-pt-xl">Badges</div>
             <div class="row q-gutter-md">
-               <div
+              <div
                 v-for="index in slotsVisiveis"
                 :key="`home-slot-${index}`"
               >
@@ -80,31 +79,7 @@
 
         <div class="col-12 col-md-5">
 
-          <div class="text-h5 q-pt-lg q-mb-md">Ranking da Turma</div>
-          <q-table
-            :rows="rankingRows"
-            :columns="rankingColumns"
-            row-key="aluno"
-            flat
-            dark
-            card-class="bg-dark"
-            hide-header
-            hide-bottom
-            separator="none"
-          >
-            <template v-slot:body="props">
-              <q-tr :props="props" :class="{ 'bg-primary text-white': props.row.aluno === 'Jane Doe (Voce)' }">
-                <q-td key="pos" :props="props">
-                  <q-chip dense :color="props.row.chipColor" text-color="dark" class="text-weight-bold">{{ props.row.pos }}</q-chip>
-                </q-td>
-                <q-td key="aluno" :props="props">{{ props.row.aluno }}</q-td>
-                <q-td key="nivel" :props="props">{{ props.row.nivel }}</q-td>
-              </q-tr>
-            </template>
-          </q-table>
-          <div class="row justify-end q-mt-md">
-            <q-btn flat color="primary" label="Ver Ranking Completo" />
-          </div>
+          <RankingTurma/>
 
         </div>
       </div>
@@ -113,9 +88,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useBadgeStore } from 'src/stores/badgeStore';
-import SecaoNivelXP from 'src/components/NivelXP/SecaoNivelXP.vue';
+import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
+import RankingTurma from 'src/pages/PageRanking.vue'
 
 const badgeStore = useBadgeStore();
 
@@ -123,18 +98,7 @@ const slotsVisiveis = 5;
 const emptySlotImage = 'public/emptyBadgeSlot.png';
 
 // Dados para a tabela de ranking
-const rankingColumns = [
-  { name: 'pos', align: 'left', label: 'POS.', field: 'pos' },
-  { name: 'aluno', align: 'left', label: 'ALUNO', field: 'aluno' },
-  { name: 'nivel', align: 'right', label: 'NÍVEL', field: 'nivel' },
-]
-const rankingRows = ref([
-  { pos: '1º', aluno: 'Ana Maria Silva', nivel: 10, chipColor: 'amber-6' },
-  { pos: '2º', aluno: 'João Paulo Santos', nivel: 8, chipColor: 'blue-grey-3' },
-  { pos: '3º', aluno: 'Laura Prado', nivel: 6, chipColor: 'deep-orange-4' },
-  { pos: '4º', aluno: 'Pedro Toledo', nivel: 4, chipColor: 'transparent' },
-  { pos: '10º', aluno: 'Jane Doe (Voce)', nivel: 'X', chipColor: 'transparent' },
-])
+
 
 
 </script>

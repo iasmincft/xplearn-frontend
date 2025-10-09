@@ -10,7 +10,10 @@ const routes = [
       { 
         path: 'home', 
         component: () => import('src/pages/PageHome.vue'),
-        meta: { title: 'Home' } 
+        meta: { 
+          title: 'Home' ,
+          hideHeaderElement: true
+        } 
       },
       { 
         path: '/atividades', 
@@ -35,7 +38,10 @@ const routes = [
       { 
         path: '/settings', 
         component: () => import('src/pages/PageSettings.vue'),
-        meta: { title: 'Settings' }
+        meta: { 
+          title: 'Settings',
+          hideHeaderElement: true
+        } 
       }
     ]
   },

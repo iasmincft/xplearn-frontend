@@ -13,7 +13,9 @@
             </div>
             <q-space />
             <div class="col-xs-12 col-sm-5 q-pr-lg">
-              <SecaoNivelXP />
+              <SecaoNivelXP 
+                v-if="userStore.isAluno"
+              />
             </div>
           </div>
         </q-card-section>
@@ -56,7 +58,7 @@
                 </q-list>
               </q-card>
             </div>
-          <div style="width: fit-content;">
+          <div style="width: fit-content;" v-if="userStore.isAluno">
             <div class="text-h5 q-mb-md q-pt-xl">Badges</div>
             <div class="row q-gutter-md">
               <div
@@ -79,7 +81,13 @@
 
         <div class="col-12 col-md-5">
 
-          <RankingTurma/>
+          <RankingTurma
+            v-if="userStore.isAluno"
+          />
+
+          <Turmas 
+            v-if="userStore.isProfessor"
+          />
 
         </div>
       </div>
@@ -89,22 +97,22 @@
 
 <script setup>
 import { useBadgeStore } from 'src/stores/badgeStore';
+import { useUserStore } from 'src/stores/userStore';
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
+import Turmas from "src/pages/PageTurmas.vue";
 
 const badgeStore = useBadgeStore();
+const userStore = useUserStore();
 
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';
-
-// Dados para a tabela de ranking
 
 
 
 </script>
 
 <style lang="scss" scoped>
-// Adiciona um estilo sutil ao card de atividades
 .q-card {
   border-radius: 8px;
 }

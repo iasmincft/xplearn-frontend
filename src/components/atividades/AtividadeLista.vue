@@ -23,5 +23,5 @@ defineProps({
   }
 })
 
-defineEmits(['toggleAtividade'])
+defineEmits(['toggleAtividade', 'editar-ati'])
 </script>

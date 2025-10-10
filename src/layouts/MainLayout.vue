@@ -59,7 +59,7 @@
           </div>
           <q-space />
           <div class="col-xs-12 col-sm-5 q-pa-sm">
-            <SecaoNivelXP v-if="!route.meta.hideHeaderElement" />
+            <SecaoNivelXP v-if="!route.meta.hideHeaderElement && userStore.isAluno" />
           </div>
         </div>
       </div>

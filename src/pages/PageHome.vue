@@ -95,7 +95,7 @@ import RankingTurma from 'src/pages/PageRanking.vue'
 const badgeStore = useBadgeStore();
 
 const slotsVisiveis = 5;
-const emptySlotImage = 'public/emptyBadgeSlot.png';
+const emptySlotImage = '/emptyBadgeSlot.png';
 
 // Dados para a tabela de ranking
 

@@ -10,4 +10,11 @@ export const useUserStore = defineStore('user', {
     isProfessor: (state) => state.currentUser.role === 'professor',
     isAluno: (state) => state.currentUser.role === 'aluno'
   },
+  actions: {
+    setRole(newRole) {
+      if (['aluno', 'professor'].includes(newRole)) {
+        this.currentUser.role = newRole
+      }
+    }
+  }
 })

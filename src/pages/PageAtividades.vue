@@ -45,7 +45,7 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
-import AtividadeLista from 'src/components/Atividades/AtividadeLista.vue';
+import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 
 const tabAtividades = ref('pendentes');
 const route = useRoute();

@@ -11,7 +11,7 @@
       </q-item-section>
       
       <q-item-section>
-        <q-item-label>{{ atividade.titulo }}</q-item-label>
+        <q-item-label>{{ atividade.nome }}</q-item-label>
         <q-item-label caption class="text-grey-5">Entrega: {{ atividade.data }}</q-item-label>
       </q-item-section>
       
@@ -24,7 +24,19 @@
           flat 
           dense 
           size="md"
-          @click.stop="$emit('editar-ati', atividade)"
+          @click.stop="$emit('editar-atividade', atividade)"
+          />
+      </q-item-section>
+      <q-item-section avatar>
+        <q-btn 
+          v-if="userStore.isProfessor"
+          color="negative" 
+          icon="delete" 
+          class="text-h5" 
+          flat 
+          dense 
+          size="md"
+          @click.stop="$emit('deletar-atividade', atividade)"
           />
       </q-item-section>
       </template>
@@ -70,7 +82,7 @@ defineProps({
   }
 })
 
-defineEmits(['editar-ati'])
+defineEmits(['editar-atividade'])
 </script>
 
 <style lang="scss">

@@ -9,6 +9,8 @@
       :key="atividade.id" 
       :atividade="atividade"
       @toggle-atividade="$emit('toggleAtividade', $event)"
+      @editar-atividade ="$emit('editar-atividade', $event)"
+      @deletar-atividade="promptToDelete" 
     />
   </transition-group>
 </template>
@@ -23,5 +25,5 @@ defineProps({
   }
 })
 
-defineEmits(['toggleAtividade', 'editar-ati'])
+defineEmits(['toggleAtividade', 'editar-atividade'])
 </script>

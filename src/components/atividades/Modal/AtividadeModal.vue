@@ -3,18 +3,13 @@
         <ModalHeader @close="closeModal">{{ isEditing ? 'Editar Atividade' : 'Nova Atividade' }}</ModalHeader>
 
         <q-card-section class="q-pa-md">
-            <q-form @submit.prevent="salvar" class="q-gutter-md" ref="formRef">
+            <q-form @submit.prevent="saveAtividade" class="q-gutter-md" ref="formRef">
 
-                <ModalNomeAti></ModalNomeAti>
+                <ModalNomeAti v-model:nome="localAtividade.name" />
 
-                <ModalData @open-date-picker="setDefaultDate"></ModalData>
+                <ModalData v-model:data="localAtividade.data" @open-date-picker="setDefaultDate" />
 
-                <div class="row justify-end">
-                    <q-toggle v-model="showTimeField" label="Add time" label-left color="accent"
-                        v-if="localTask.dueDate" />
-                </div>
-
-                <ModalDescricao  :show-time-field="showTimeField"></ModalDescricao>
+                <ModalDescricao v-model:descricao="localAtividade.descricao" />
 
                 <ModalButtons :is-dirty="isDirty" />
 
@@ -33,7 +28,7 @@ import ModalDescricao from './Shared/ModalDescricao.vue';
 import ModalButtons from './Shared/ModalButtons.vue';
 
 const props = defineProps({
-    task: {
+    atividade: {
         type: Object,
         default: null,
     },
@@ -43,52 +38,50 @@ const emit = defineEmits(['close', 'salvar']);
 
 const $q = useQuasar();
 const formRef = ref(null);
-const localTask = reactive({
+const localAtividade = reactive({
     name: '',
-    dueDate: '',
-    dueTime: '',
+    data: '',
+    descricao: '',
     completed: false,
 });
-const showTimeField = ref(false);
+
 const isDirty = ref(false);
 
-const isEditing = computed(() => !!props.task);
+const isEditing = computed(() => !!props.atividade);
 
-watch(() => props.task, (newVal) => {
+watch(() => props.atividade, (newVal) => {
     if (newVal) {
-        Object.assign(localTask, newVal);
-        showTimeField.value = !!newVal.dueTime;
+        Object.assign(localAtividade, newVal);
         isDirty.value = false;
     } else {
         // Reset para uma nova tarefa
-        Object.assign(localTask, {
+        Object.assign(localAtividade, {
             name: '',
-            dueDate: '',
-            dueTime: '',
+            data: '',
+            descricao: '',
             completed: false,
         });
-        showTimeField.value = false;
     }
 }, { immediate: true });
 
-watch(localTask, (newVal) => {
-    if (props.task) {
-        const originalTask = { ...props.task };
-        isDirty.value = JSON.stringify(newVal) !== JSON.stringify(originalTask);
+watch(localAtividade, (newVal) => {
+    if (props.atividade) {
+        const originalAtividade = { ...props.atividade };
+        isDirty.value = JSON.stringify(newVal) !== JSON.stringify(originalAtividade);
     } else {
         // Para novas tarefas, verifica se o nome foi preenchido
         isDirty.value = !!newVal.name;
     }
 }, { deep: true });
 
-function saveTask() {
+function saveAtividade() {
     formRef.value.validate().then((success) => {
         if (success) {
-            emit('save-task', { ...localTask });
+            emit('save-atividade', { ...localAtividade });
             emit('close');
         } else {
             $q.notify({
-                message: 'Cannot save task without a name.',
+                message: 'Não pode salvar sem um nome.',
                 color: 'negative',
                 icon: 'warning',
             });
@@ -97,21 +90,20 @@ function saveTask() {
 }
 
 function setDefaultDate() {
-    if (!localTask.dueDate) {
+    if (!localAtividade.data) {
         const today = new Date();
         const day = String(today.getDate()).padStart(2, '0');
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const year = today.getFullYear();
-        localTask.dueDate = `${day}/${month}/${year}`;
+        localAtividade.data = `${day}/${month}/${year}`;
     }
 }
 
 watch(
-    () => localTask.dueDate,
+    () => localAtividade.data,
     (newVal) => {
         if (!newVal) {
-            localTask.dueTime = '';
-            showTimeField.value = false;
+            localAtividade.descricao = '';
         }
     }
 );
@@ -119,8 +111,8 @@ watch(
 const closeModal = () => {
     if (isDirty.value) {
         $q.dialog({
-            title: 'Discard Changes',
-            message: 'You have unsaved changes. Do you want to close and lose them?',
+            title: 'Descartar alterações?',
+            message: 'Você fez alterações. Deseja fechar sem?',
             ok: {
                 push: true,
                 color: 'positive'

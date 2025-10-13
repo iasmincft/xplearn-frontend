@@ -15,5 +15,5 @@
 
 <script setup>
 
-const emit = defineEmits(['close']);
+defineEmits(['close']);
 </script>

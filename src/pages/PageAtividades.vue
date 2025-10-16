@@ -13,6 +13,8 @@
               v-if="atividadesStore.atividadesPendentes.length > 0"
               :atividades="atividadesStore.atividadesPendentes" 
               @toggle-atividade="atividadesStore.alternarConcluida" 
+              @editar-atividade="abrirModalEdicao"
+              @deletar-atividade="promptToDelete"
             />
             <div v-else class="fit flex flex-center text-center column">
               <div class="text-grey-5 q-mt-md">Nada por aqui.</div>
@@ -33,27 +35,85 @@
     </div>
 
     <q-page-sticky position="bottom-right" :offset="[50, 50]" v-if="userStore.isProfessor">
-      <q-btn fab icon="add" color="accent" />
+      <q-btn 
+        fab 
+        icon="add" 
+        color="accent"
+        @click="showAddAtividade = true"
+        />
     </q-page-sticky>
+
+    <q-dialog v-model="showAddAtividade">
+      <AddAtividade @close="showAddAtividade = false"/>
+    </q-dialog>
+
+    <q-dialog v-model="showEditarAtividade">
+      <EditarAtividade ref="editarAtividadeRef" @close="showEditarAtividade = false" />
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { useQuasar } from 'quasar';
+import { onMounted, ref, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
 import { useUserStore } from 'src/stores/userStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
+import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
+import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
 
 
 const userStore = useUserStore();
 const tabAtividades = ref('pendentes');
 const route = useRoute();
 const atividadesStore = useAtividadesStore();
+const $q = useQuasar();
+const showAddAtividade = ref(false);
+const showEditarAtividade = ref(false);
+const editarAtividadeRef = ref(null);
 
 onMounted(() => {
   if (route.query.tab) {
     tabAtividades.value = route.query.tab;
   }
 });
+
+const promptToDelete = (id) => {
+  $q.dialog({
+    title: 'Confirme para deletar',
+    message: 'Tem certeza que deseja deletar essa atividade?',
+    ok: {
+      push: true,
+      color: 'positive'
+    },
+    cancel: {
+      color: 'negative',
+      push: true
+    },
+    persistent: true
+  }).onOk(() => {
+    atividadesStore.deleteTask(id);
+    $q.notify({
+      message: 'Atividade deletada!',
+      color: 'positive',
+      icon: 'check'
+    });
+  }).onCancel(() => {
+    $q.notify({
+      message: 'Ação cancelada.',
+      color: 'info',
+      icon: 'cancel'
+    });
+  });
+};
+
+function abrirModalEdicao(atividade) {
+  showEditarAtividade.value = true;
+  nextTick(() => {
+    if (editarAtividadeRef.value) {
+      editarAtividadeRef.value.open(atividade);
+    }
+  });
+}
 </script>

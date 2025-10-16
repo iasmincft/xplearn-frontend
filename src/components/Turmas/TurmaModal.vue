@@ -1,15 +1,13 @@
 <template>
     <q-card>
-        <ModalHeader @close="closeModal">{{ isEditing ? 'Editar Atividade' : 'Nova Atividade' }}</ModalHeader>
+        <ModalHeader @close="closeModal">{{ isEditing ? 'Editar Turma' : 'Nova Turma' }}</ModalHeader>
 
         <q-card-section class="q-pa-md">
-            <q-form @submit.prevent="saveAtividade" class="q-gutter-md" ref="formRef">
+            <q-form @submit.prevent="saveTurma" class="q-gutter-md" ref="formRef">
 
-                <ModalNomeAti v-model:nome="localAtividade.name" />
+                <ModalNome v-model:nome="localTurma.name" />
 
-                <ModalData v-model:data="localAtividade.data" @open-date-picker="setDefaultDate" />
-
-                <ModalDescricao v-model:descricao="localAtividade.descricao" />
+                <ModalProf v-model:professor="localTurma.professor"/>
 
                 <ModalButtons :is-dirty="isDirty" />
 
@@ -22,9 +20,8 @@
 import { reactive, watch, ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import ModalHeader from './Shared/ModalHeader.vue';
-import ModalNomeAti from './Shared/ModalNomeAti.vue';
-import ModalData from './Shared/ModalData.vue';
-import ModalDescricao from './Shared/ModalDescricao.vue';
+import ModalNome from './Shared/ModalNome.vue';
+import ModalProf from './Shared/ModalProf.vue';
 import ModalButtons from './Shared/ModalButtons.vue';
 
 const props = defineProps({
@@ -38,9 +35,9 @@ const emit = defineEmits(['close', 'salvar']);
 
 const $q = useQuasar();
 const formRef = ref(null);
-const localAtividade = reactive({
+const localTurma = reactive({
     name: '',
-    data: '',
+    professor: '',
     descricao: '',
     completed: false,
 });
@@ -51,33 +48,33 @@ const isEditing = computed(() => !!props.atividade);
 
 watch(() => props.atividade, (newVal) => {
     if (newVal) {
-        Object.assign(localAtividade, newVal);
+        Object.assign(localTurma, newVal);
         isDirty.value = false;
     } else {
         // Reset para uma nova tarefa
-        Object.assign(localAtividade, {
+        Object.assign(localTurma, {
             name: '',
-            data: '',
+            professor: '',
             descricao: '',
             completed: false,
         });
     }
 }, { immediate: true });
 
-watch(localAtividade, (newVal) => {
+watch(localTurma, (newVal) => {
     if (props.atividade) {
-        const originalAtividade = { ...props.atividade };
-        isDirty.value = JSON.stringify(newVal) !== JSON.stringify(originalAtividade);
+        const originalTurma = { ...props.atividade };
+        isDirty.value = JSON.stringify(newVal) !== JSON.stringify(originalTurma);
     } else {
         // Para novas tarefas, verifica se o nome foi preenchido
         isDirty.value = !!newVal.name;
     }
 }, { deep: true });
 
-function saveAtividade() {
+function saveTurma() {
     formRef.value.validate().then((success) => {
         if (success) {
-            emit('save-atividade', { ...localAtividade });
+            emit('save-atividade', { ...localTurma });
             emit('close');
         } else {
             $q.notify({
@@ -89,21 +86,11 @@ function saveAtividade() {
     });
 }
 
-function setDefaultDate() {
-    if (!localAtividade.data) {
-        const today = new Date();
-        const day = String(today.getDate()).padStart(2, '0');
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const year = today.getFullYear();
-        localAtividade.data = `${day}/${month}/${year}`;
-    }
-}
-
 watch(
-    () => localAtividade.data,
+    () => localTurma.professor,
     (newVal) => {
         if (!newVal) {
-            localAtividade.descricao = '';
+            localTurma.descricao = '';
         }
     }
 );

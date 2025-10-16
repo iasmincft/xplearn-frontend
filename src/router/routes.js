@@ -42,6 +42,14 @@ const routes = [
           title: 'Settings',
           hideHeaderElement: true
         } 
+      },
+      {
+        path: '/auth',
+        component: () => import('src/pages/PageAuth.vue'),
+        meta: { 
+          title: 'Auth',
+          hideHeaderAuth: true
+        } 
       }
     ]
   },

@@ -2,7 +2,7 @@
   <q-layout view="lHh LpR lFf">
 
     <q-drawer show-if-above :breakpoint="0" :width="isExpanded ? 250 : 60" @mouseover="isExpanded = true"
-      @mouseleave="isExpanded = false" class="bg-dark-page text-white">
+      @mouseleave="isExpanded = false" class="bg-dark-page text-white" v-if="!route.meta.hideHeaderAuth">
 
       <q-list class="column full-height">
         <div class="row no-wrap items-center" style="height: 70px;">
@@ -28,7 +28,8 @@
               <div class="text-weight-bold ellipsis">Jane Doe</div>
               <div class="text-caption text-grey-5 ellipsis">@janedoe</div>
             </div>
-            <div class="col-auto">
+            <div class="col-auto no-wrap">
+              <q-btn icon="more_vert" to="/auth" flat round dense />
               <q-btn icon="settings" to="/settings" flat round dense />
             </div>
           </div>
@@ -38,7 +39,7 @@
     </q-drawer>
 
     <q-page-container class="bg-dark text-white q-pb-xs">
-      <div class="text-h4 text-bold q-pa-md q-ml-lg">
+      <div class="text-h4 text-bold q-pa-md q-ml-lg" v-if="!route.meta.hideHeaderAuth">
         <div class="row">
           {{ pageTitle }}
           <q-space />

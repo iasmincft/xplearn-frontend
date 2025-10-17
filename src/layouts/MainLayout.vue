@@ -29,7 +29,7 @@
               <div class="text-caption text-grey-5 ellipsis">@janedoe</div>
             </div>
             <div class="col-auto no-wrap">
-              <q-btn icon="more_vert" to="/auth" flat round dense />
+              <q-btn icon="more_vert" to="/auth/login" flat round dense />
               <q-btn icon="settings" to="/settings" flat round dense />
             </div>
           </div>

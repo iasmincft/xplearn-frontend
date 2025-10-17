@@ -9,7 +9,9 @@ export const useTurmaStore = defineStore('turma', {
         ],
     }),
     getters: {
-
+        getTurmaById: (state) => {
+            return (id) => state.items.find(item => item.id === id);
+    }
     },
     actions: {
 

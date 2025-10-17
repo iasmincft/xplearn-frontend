@@ -6,7 +6,12 @@
                 <div class="text-grey-5 q-pl-md">{{ turma.professor }}</div>
             </q-card-section>
             <q-card-actions >
-                <q-btn flat color="primary" label="Acessar Turma" />
+                <q-btn 
+                    flat 
+                    color="primary" 
+                    label="Acessar Turma" 
+                    :to="`/turma/${turma.id}`"
+                />
             </q-card-actions>
         
     </q-card>

@@ -26,8 +26,8 @@
 <script setup>
 import { useTurmaStore } from 'src/stores/turmaStore';
 import { useUserStore } from 'src/stores/userStore';
-import TurmaItem from 'src/components/Turmas/TurmaItem.vue';
-import AddTurma from 'src/components/Turmas/AddTurma.vue';
+import TurmaItem from 'src/components/turmas/TurmaItem.vue';
+import AddTurma from 'src/components/turmas/AddTurma.vue';
 import { ref } from 'vue';
 
 const turmaStore = useTurmaStore();

@@ -30,6 +30,11 @@ const routes = [
         component: () => import('src/pages/PageTurmas.vue'),
         meta: { title: 'Turmas' }
       },
+        { 
+          path: 'turma/:id',
+          name: 'turmaAcessar',
+          component: () => import('src/components/turmas/TurmaAcessar.vue')
+        },
       { 
         path: '/badges', 
         component: () => import('src/pages/PageBadges.vue'),
@@ -49,13 +54,26 @@ const routes = [
         meta: { 
           title: 'Auth',
           hideHeaderAuth: true
-        } 
-      }
+        },
+        children: [
+          {
+            path: '',
+            redirect: '/auth/login'
+          },
+          {
+            path: 'login',
+            component: () => import('src/components/auth/loginPage.vue')
+          },
+          {
+            path: 'cadastro',
+            component: () => import('src/components/auth/cadastroPage.vue')
+          }
+        ]
+      },
+        
     ]
   },
 
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),

@@ -56,7 +56,6 @@
 <script setup>
 import { useQuasar } from 'quasar';
 import { onMounted, ref, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
 import { useUserStore } from 'src/stores/userStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
@@ -66,7 +65,6 @@ import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue
 
 const userStore = useUserStore();
 const tabAtividades = ref('pendentes');
-const route = useRoute();
 const atividadesStore = useAtividadesStore();
 const $q = useQuasar();
 const showAddAtividade = ref(false);
@@ -74,9 +72,7 @@ const showEditarAtividade = ref(false);
 const editarAtividadeRef = ref(null);
 
 onMounted(() => {
-  if (route.query.tab) {
-    tabAtividades.value = route.query.tab;
-  }
+  atividadesStore.fetchAtividades(); // Carrega os dados da API
 });
 
 const promptToDelete = (id) => {
@@ -92,13 +88,21 @@ const promptToDelete = (id) => {
       push: true
     },
     persistent: true
-  }).onOk(() => {
-    atividadesStore.deleteTask(id);
-    $q.notify({
-      message: 'Atividade deletada!',
-      color: 'positive',
-      icon: 'check'
-    });
+  }).onOk(async () => {
+    try {
+        await atividadesStore.deleteAtividade(id); 
+        $q.notify({
+            message: 'Atividade deletada!',
+            color: 'positive',
+            icon: 'check'
+        });
+    } catch (e) {
+        $q.notify({
+            message: 'Falha ao deletar a atividade. ' + (e.message || ''),
+            color: 'negative',
+            icon: 'error'
+        });
+    }
   }).onCancel(() => {
     $q.notify({
       message: 'Ação cancelada.',

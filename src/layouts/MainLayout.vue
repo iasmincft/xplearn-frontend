@@ -89,7 +89,6 @@ const userRole = computed({
   set: (newRole) => userStore.setRole(newRole)
 })
 
-
 const linksList = [
   {
     title: 'Home',

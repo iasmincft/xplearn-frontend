@@ -11,20 +11,49 @@
         <div class="">Entre na sua conta para começar.</div>
     </div>
     
-    <q-input outlined v-model="email" label="Matrícula" class="q-pb-sm">
+    <q-input 
+        outlined 
+        v-model="formData.matricula" 
+        label="Matrícula" 
+        class="q-pb-sm" 
+        type="tel" 
+        placeholder="Matrícula" 
+        :rules="[
+        val => (val && val.length > 0) || 'Campo obrigatório',
+        val => /^[0-9]+$/.test(val) || 'Use apenas números',
+        val => (val.length === 7 || val.length === 12) || 'A matrícula deve ter 7 (professor) ou 12 (aluno) dígitos'
+        ]"
+        maxlength="12"
+        lazy-rules
+        bottom-slots
+        hide-bottom-space
+        >
         <template v-slot:prepend>
             <q-icon name="person" />
         </template>
     </q-input>
     
-    <q-input outlined v-model="password" :type="isPwd ? 'password' : 'text'" label="Senha" class="q-pb-sm">
+    <q-input 
+        outlined 
+        v-model="formData.senha" 
+        :type="isSenhaVisible ? 'text' : 'password'"
+        label="Senha" 
+        class="q-pb-sm" 
+        lazy-rules
+        :rules="[
+            val => !!val || 'Insira a senha.',
+            val => val.length >= 6 || 'A senha deve ter pelo menos 6 caracteres.'
+        ]" 
+        bottom-slots
+        hide-bottom-space
+    >
         <template v-slot:prepend>
             <q-icon name="lock" />
         </template>
         <template v-slot:append>
-            <q-icon v-if="password" name="close" @click="password = ''" class="cursor-pointer" />
-            <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer"
-                @click="isPwd = !isPwd" />
+            <q-icon v-if="formData.senha" name="close" @click="formData.senha = ''" class="cursor-pointer" />
+            <q-icon :name="isSenhaVisible ? 'visibility' : 'visibility_off'" class="cursor-pointer"
+                @click="isSenhaVisible = !isSenhaVisible" />
         </template>
     </q-input>
     
@@ -58,18 +87,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 
-const email = ref('');
-const password = ref('');
-const isPwd = ref(true);
-
+const formData = reactive({
+    matricula: '',
+    senha: '',
+});
+const isSenhaVisible = ref(false);
 
 </script>
 
 <style scoped>
-
 
 .gradient-button {
     background: linear-gradient(90deg, #5ce1e6, #8c52ff);

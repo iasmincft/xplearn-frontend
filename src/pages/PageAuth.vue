@@ -1,6 +1,6 @@
 <template>
     <q-page class="bg-dark-page flex flex-center auth-bg">
-        <q-card class="q-pa-xl text-black" style="background: white">
+        <q-card class="q-pa-xl text-black" style="background: white;width: 380px;">
             <router-view />
         </q-card>
     </q-page>

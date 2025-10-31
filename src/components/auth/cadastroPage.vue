@@ -11,18 +11,21 @@
         />
         <div class="col text-center text-weight-bold ellipsis text-black text-h5">Cadastrar</div>
     </div>
-    <div class="text-center q-pb-md border-style">
-        <q-btn 
-            to="" 
-            icon="edit"
-            color="grey"
-            unelevated
-            round
-            size="30px"
-            style="border: 2px solid #8c52ff  "
-        />
-    </div>
+    
     <q-form @submit.prevent="onSubmit">
+        <div class="text-center q-pb-md border-style">
+            <q-btn  
+                icon="edit"
+                color="grey"
+                unelevated
+                round
+                size="30px"
+                style="border: 2px solid #8c52ff"
+                @click="abrirModalAvatares = true"
+            />
+            <ModalAvatares v-model="abrirModalAvatares" />
+            
+        </div>
         <q-input 
             dense 
             outlined 
@@ -137,6 +140,7 @@ import { ref, reactive } from 'vue';
 import { api } from 'boot/axios'; // Importe da 'api' 
 import { useQuasar } from 'quasar'; // Para mostrar pop-ups (feedback)
 import { useRouter } from 'vue-router';// Para navegar após o cadastro
+import ModalAvatares from './modalAvatares.vue'; 
 
 const $q = useQuasar();
 const router = useRouter();
@@ -151,6 +155,8 @@ const formData = reactive({
 
 const isSenhaVisible = ref(false);
 const isConfirmarVisible = ref(false);
+
+const abrirModalAvatares = ref(false);
 
 async function onSubmit() {
     // Decide qual URL chamar baseado no tamanho da matrícula

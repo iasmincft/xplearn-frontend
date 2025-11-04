@@ -147,7 +147,8 @@ async function onSubmit() {
                 nickname: formData.nickname,
                 senha: formData.senha,
                 xp: 0,
-                nivel: 1,
+                nivel: 0,
+                icone: null,
                 avatar_id_fk: finalAvatarId // Valor padrão
             };
         } else if (isProfessor) {
@@ -172,7 +173,7 @@ async function onSubmit() {
             icon: 'check_circle'
         });
 
-        router.push('/auth/login'); // Navega para o login
+        router.push('/home'); // Navega para a página inicial
 
     } catch (error) {
         // Erro se a matrícula já existe ou outro problema

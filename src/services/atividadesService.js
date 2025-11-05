@@ -28,8 +28,3 @@ export async function updateAtividade(payload) {
 export async function deleteAtividade(id) {
   await api.delete(`${basePath}${id}`)
 }
-
-
-
-
-

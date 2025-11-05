@@ -1,5 +1,10 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { api } from 'src/boot/axios'
+import {
+  listAtividades,
+  createAtividade,
+  updateAtividade as updateAtividadeService,
+  deleteAtividade as deleteAtividadeService,
+} from 'src/services/atividadesService'
 
 export const useAtividadesStore = defineStore('atividades', {
   state: () => ({
@@ -20,9 +25,8 @@ export const useAtividadesStore = defineStore('atividades', {
       this.loading = true
       this.error = null
       try {
-
-        const response = await api.get('/atividades/')
-        this.items = response.data
+        const data = await listAtividades()
+        this.items = data
       } catch (err) {
         this.error = 'Falha ao buscar atividades da API.'
         console.error('Erro ao buscar atividades:', err)
@@ -32,17 +36,17 @@ export const useAtividadesStore = defineStore('atividades', {
     },
 
     async alternarConcluida(idParaAlternar) {
-        const atividade = this.items.find(item => item.id === idParaAlternar)
-        if (atividade) {
-            const atividadeModificada = { ...atividade, concluida: !atividade.concluida };
-            // Chamamos a ação principal de atualização
-            await this.updateAtividade(atividadeModificada); 
-        }
+      const atividade = this.items.find(item => item.id === idParaAlternar)
+      if (atividade) {
+        const atividadeModificada = { ...atividade, concluida: !atividade.concluida };
+        // Chamamos a ação principal de atualização
+        await this.updateAtividade(atividadeModificada);
+      }
     },
     async addAtividade(novaAtividade) {
       try {
-        const response = await api.post('/atividades/', novaAtividade)
-        this.items.unshift(response.data)
+        const created = await createAtividade(novaAtividade)
+        this.items.unshift(created)
       } catch (err) {
         this.error = 'Falha ao adicionar atividade.'
         console.error('Erro ao adicionar atividade:', err)
@@ -59,11 +63,11 @@ export const useAtividadesStore = defineStore('atividades', {
           throw new Error("Atividade não encontrada localmente.")
         }
 
-        // PUT ou PATCH para o endpoint que atualiza (ex: /atividades/1)
-        await api.put(`/atividades/${atividadeAtualizada.id}`, atividadeAtualizada)
+        // PUT ou PATCH via service
+        const updated = await updateAtividadeService(atividadeAtualizada)
 
         // Atualiza o estado local após o sucesso do backend
-        this.items[index] = atividadeAtualizada
+        this.items[index] = updated ?? atividadeAtualizada
 
       } catch (err) {
         this.error = 'Falha ao atualizar atividade.'
@@ -74,12 +78,12 @@ export const useAtividadesStore = defineStore('atividades', {
 
     async deleteAtividade(idParaDeletar) {
       try {
-        // DELETE para o endpoint que deleta (ex: /atividades/1)
-        await api.delete(`/atividades/${idParaDeletar}`)
-        
+        // DELETE via service
+        await deleteAtividadeService(idParaDeletar)
+
         // Remove do estado local após o sucesso do backend
         this.items = this.items.filter(item => item.id !== idParaDeletar)
-        
+
       } catch (err) {
         this.error = 'Falha ao deletar atividade.'
         console.error('Erro ao deletar atividade:', err)

@@ -6,7 +6,7 @@
         <q-card-section>
           <div class="row items-center">
             <q-avatar size="100px">
-              <img src="https://cdn.quasar.dev/img/avatar.png"> </q-avatar>
+              <img :src="avatarStore.selectedAvatarUrl"> </q-avatar>
             <div class="q-ml-lg">
               <div class="text-h4">Jane Doe</div>
               <div class="text-grey-5">@janedoe</div>
@@ -98,12 +98,27 @@
 <script setup>
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { useUserStore } from 'src/stores/userStore';
+import { useAvatarStore } from 'src/stores/avatarStore';
+import { onMounted } from 'vue';
+
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
 import Turmas from "src/pages/PageTurmas.vue";
 
 const badgeStore = useBadgeStore();
 const userStore = useUserStore();
+const avatarStore = useAvatarStore();
+
+onMounted(async () => {
+  
+    if (avatarStore.items.length === 0) {
+        await avatarStore.fetchAvatares();
+    }
+
+    if (userStore.isAluno && userStore.dadosDoAluno.avatar_id) {
+      avatarStore.setAvatar(userStore.dadosDoAluno.avatar_id);
+    }
+});
 
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';

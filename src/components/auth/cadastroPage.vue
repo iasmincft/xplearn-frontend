@@ -105,6 +105,7 @@ import { api } from 'boot/axios'; // Importe da 'api'
 import { useQuasar } from 'quasar'; // Para mostrar pop-ups (feedback)
 import { useRouter } from 'vue-router';// Para navegar após o cadastro
 import { useAvatarStore } from 'src/stores/avatarStore';
+import { useUserStore } from 'src/stores/userStore';
 import { storeToRefs } from 'pinia';
 import ModalAvatares from './modalAvatares.vue';
 
@@ -112,6 +113,8 @@ const $q = useQuasar();
 const router = useRouter();
 
 const avatarStore = useAvatarStore();
+const userStore = useUserStore();
+
 const { selectedAvatarUrl, selectedAvatarId } = storeToRefs(avatarStore);
 
 const formData = reactive({
@@ -137,10 +140,12 @@ async function onSubmit() {
     try {
         let payload;
         let url;
+        let tipoUsuario;
 
         if (isAluno) {
             // Monta o pacote de dados (payload) como a API de Aluno espera
-            url = '/alunos'; //
+            url = '/alunos';
+            tipoUsuario = 'aluno';
             payload = {
                 matricula: formData.matricula,
                 nome: formData.nome,
@@ -153,7 +158,8 @@ async function onSubmit() {
             };
         } else if (isProfessor) {
             // Monta o payload como a API de Professor espera
-            url = '/professores'; //
+            url = '/professores';
+            tipoUsuario = 'professor';
             payload = {
                 matricula: formData.matricula,
                 nome: formData.nome,
@@ -165,7 +171,9 @@ async function onSubmit() {
         }
         await api.post(url, payload);
 
-        // 
+        userStore.setRole(tipoUsuario);
+
+        
         $q.notify({
             color: 'positive',
             position: 'top',

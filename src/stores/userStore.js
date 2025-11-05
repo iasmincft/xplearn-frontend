@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
+import { api } from 'boot/axios';
+import { useAvatarStore } from './avatarStore';
+
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     currentUser: {
-      role: 'aluno' 
+      role: null
     }
   }),
   getters: {
@@ -15,6 +18,23 @@ export const useUserStore = defineStore('user', {
       if (['aluno', 'professor'].includes(newRole)) {
         this.currentUser.role = newRole
       }
+    },
+
+    async login(matricula, senha) {
+      
+      const credentials = {
+        matricula: matricula, 
+        senha: senha,         
+      };
+      
+      const { data } = await api.post('/login', credentials);
+      
+      this.setDados(data.user);
+
+      const avatarStore = useAvatarStore();
+      await avatarStore.fetchAvatares(); 
+
+      avatarStore.setAvatar(data.user.avatar_id);
     }
   }
 })

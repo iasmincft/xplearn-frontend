@@ -11,7 +11,7 @@
                 <q-img 
                     v-for="avatar in avatarStore.items" 
                     :key="avatar.id" 
-                    :src="avatar.caminho_foto"
+                    :src="getAvatarSrc(avatar.caminho_foto)"
                     @click="selectAvatar(avatar.id)" 
                     width="100px" 
                     height="100px" 
@@ -28,12 +28,20 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useAvatarStore } from 'src/stores/avatarStore';
+import { api } from 'src/boot/axios';
 
-//const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-/* const getAvatarFullPath = (caminhoFoto) => {
-    return `/static${caminhoFoto}`;
-};
-*/
+const BASE_URL_AXIOS = api.defaults.baseURL;
+
+const getAvatarSrc = (caminhoFoto) => {
+    
+    const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
+    
+    const path = caminhoFoto.startsWith('/') ? caminhoFoto : `/${caminhoFoto}`;
+
+    const fullUrl = `${baseUrl}/static${path}`;
+    
+    return fullUrl;
+}
 
 const avatarStore = useAvatarStore();
 

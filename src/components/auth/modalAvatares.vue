@@ -7,7 +7,6 @@
 
         <q-card-section class="q-pt-none">
             <div class="q-gutter-md row justify-center">
-
                 <q-img 
                     v-for="avatar in avatarStore.items" 
                     :key="avatar.id" 

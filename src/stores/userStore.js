@@ -21,20 +21,29 @@ export const useUserStore = defineStore('user', {
     },
 
     async login(matricula, senha) {
+
+      let userRole;
+      if (matricula.length === 12) {
+      userRole = 'aluno';
+    } else (matricula.length === 7) {
+      userRole = 'professor';
+    }
       
       const credentials = {
         matricula: matricula, 
         senha: senha,         
       };
       
-      const { data } = await api.post('/login', credentials);
-      
+      const loginUrl = `/login/${userRole}`;
+
+      const { data } = await api.post(loginUrl, credentials);
+      this.setRole(userRole);
       this.setDados(data.user);
 
-      const avatarStore = useAvatarStore();
-      await avatarStore.fetchAvatares(); 
+      //const avatarStore = useAvatarStore();
+      //await avatarStore.fetchAvatares(); 
 
-      avatarStore.setAvatar(data.user.avatar_id);
+      //avatarStore.setAvatar(data.user.avatar_id);
     }
   }
 })

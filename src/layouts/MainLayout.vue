@@ -21,7 +21,7 @@
         <div class="row full-width no-wrap items-end q-pb-lg" style="height: 70px;">
           <div class="col-auto row justify-center items-center" style="width: 60px;">
             <q-avatar size="40px">
-              <img src="https://cdn.quasar.dev/img/avatar.png" style="border: 2px solid white"> </q-avatar>
+              <img :src="avatarStore.selectedAvatarUrl" style="border: 2px solid white"> </q-avatar>
           </div>
           <div v-show="isExpanded" class="row no-wrap items-center">
             <div class="col q-pl-sm" style="width: 130px;">
@@ -74,10 +74,16 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from 'stores/userStore'
+import { useAvatarStore } from 'src/stores/avatarStore';
+import { onMounted } from 'vue';
+
+
 import EssentialLink from 'components/EssentialLink.vue'
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 
 const userStore = useUserStore()
+const avatarStore = useAvatarStore();
+
 const isExpanded = ref(false)
 
 const headerTitle = 'XP Learn'
@@ -118,6 +124,17 @@ const linksList = [
   },
 
 ]
+
+onMounted(async () => {
+  
+    if (avatarStore.items.length === 0) {
+        await avatarStore.fetchAvatares();
+    }
+
+    if (userStore.isAluno && userStore.dadosDoAluno.avatar_id) {
+      avatarStore.setAvatar(userStore.dadosDoAluno.avatar_id);
+    }
+});
 
 </script>
 

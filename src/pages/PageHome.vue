@@ -6,7 +6,10 @@
         <q-card-section>
           <div class="row items-center">
             <q-avatar size="100px">
-              <img :src="avatarStore.selectedAvatarUrl"> </q-avatar>
+              <img :src="avatarStore.selectedAvatarUrl"
+              style="border-radius: 50px; border: 3px solid white "
+              > 
+            </q-avatar>
             <div class="q-ml-lg">
               <div class="text-h4">Jane Doe</div>
               <div class="text-grey-5">@janedoe</div>

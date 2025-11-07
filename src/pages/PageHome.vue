@@ -11,8 +11,8 @@
               > 
             </q-avatar>
             <div class="q-ml-lg">
-              <div class="text-h4">Jane Doe</div>
-              <div class="text-grey-5">@janedoe</div>
+              <div class="text-h4">{{ userStore.currentUser?.nome }}</div>
+              <div class="text-grey-5">@{{userStore.currentUser?.nickname }}</div>
             </div>
             <q-space />
             <div class="col-xs-12 col-sm-5 q-pr-lg">
@@ -102,7 +102,7 @@
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { useUserStore } from 'src/stores/userStore';
 import { useAvatarStore } from 'src/stores/avatarStore';
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
@@ -112,21 +112,27 @@ const badgeStore = useBadgeStore();
 const userStore = useUserStore();
 const avatarStore = useAvatarStore();
 
-onMounted(async () => {
-  
-    if (avatarStore.items.length === 0) {
-        await avatarStore.fetchAvatares();
-    }
-
-    if (userStore.isAluno && userStore.dadosDoAluno.avatar_id) {
-      avatarStore.setAvatar(userStore.dadosDoAluno.avatar_id);
-    }
-});
-
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';
 
+const syncAvatar = async () => {
+  if (avatarStore.items.length === 0) {
+      await avatarStore.fetchAvatares();
+  }
+  if (userStore.currentUser?.avatar_id) {
+      avatarStore.setAvatar(userStore.currentUser.avatar_id);
+  }
+}
 
+onMounted(async () => {
+    await syncAvatar();
+});
+
+watch(() => userStore.currentUser?.avatar_id, (newId) => {
+    if (newId) {
+        syncAvatar();
+    }
+});
 
 </script>
 

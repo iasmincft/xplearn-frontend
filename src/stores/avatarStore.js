@@ -16,7 +16,7 @@ export const useAvatarStore = defineStore("avatar", {
         loading: false,
         error: null,
         selectedAvatarId: null,
-        selectedAvatarUrl: null,
+        selectedAvatarUrl: '',
     }),
 
     getters: {
@@ -38,13 +38,17 @@ export const useAvatarStore = defineStore("avatar", {
                 this.loading = false;
             }
         },
-    setAvatar(id) {
-        this.selectedAvatarId = id;
-        const avatar = this.items.find(a => a.id === id);
-        
-        if (avatar) {
-            this.selectedAvatarUrl = getFullPath(avatar.caminho_foto);
+        setAvatar(id) {
+            this.selectedAvatarId = id;
+            const avatar = this.items.find(a => a.id === id);
+            
+            if (avatar) {
+                this.selectedAvatarUrl = getFullPath(avatar.caminho_foto);
+            }
+        },
+        clearAvatar() {
+            this.selectedAvatarId = null;
+            this.selectedAvatarUrl = '';
         }
-    }
     }
 });

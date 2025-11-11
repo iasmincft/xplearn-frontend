@@ -1,77 +1,199 @@
 <template>
     <div class="row items-center relative-position q-mb-lg">
-        <q-btn 
-            to="/auth/login" 
-            icon="chevron_left"
-            color="secondary"
-            class="absolute-left"
-            unelevated
-            round
-            dense
-        />
+        <q-btn to="/auth/login" icon="chevron_left" color="secondary" class="absolute-left" unelevated round dense />
         <div class="col text-center text-weight-bold ellipsis text-black text-h5">Cadastrar</div>
     </div>
-    <div class="text-center q-pb-md border-style">
-        <q-btn 
-            to="" 
-            icon="edit"
-            color="grey"
-            unelevated
-            round
-            size="30px"
-            style="border: 2px solid #8c52ff  "
-        />
-    </div>
-    <q-input dense outlined v-model="email" label="Matrícula*" class="q-pb-sm">
-        <template v-slot:prepend>
-            <q-icon name="check" />
-        </template>
-    </q-input>
-    <q-input dense outlined v-model="email" label="Nome*" class="q-pb-sm">
-        <template v-slot:prepend>
-            <q-icon name="person" />
-        </template>
-    </q-input>
-    <q-input dense outlined v-model="email" label="Nickname" class="q-pb-sm">
-        <template v-slot:prepend>
-            <q-icon name="person" />
-        </template>
-    </q-input>
-    
-    
-    <q-input dense outlined v-model="password" :type="isPwd ? 'password' : 'text'" label="Senha*" class="q-pb-sm">
-        <template v-slot:prepend>
-            <q-icon name="lock" />
-        </template>
-        <template v-slot:append>
-            <q-icon v-if="password" name="close" @click="password = ''" class="cursor-pointer" />
-            <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer"
-                @click="isPwd = !isPwd" />
-        </template>
-    </q-input>
-    <q-input dense outlined v-model="password" :type="isPwd ? 'password' : 'text'" label="Confirmar senha*" class="q-pb-sm">
-        <template v-slot:prepend>
-            <q-icon name="lock" />
-        </template>
-        <template v-slot:append>
-            <q-icon v-if="password" name="close" @click="password = ''" class="cursor-pointer" />
-            <q-icon :name="isPwd ? 'visibility' : 'visibility_off'" class="cursor-pointer"
-                @click="isPwd = !isPwd" />
-        </template>
-    </q-input>
-    
-    <div class="text-center q-pt-md" >
-        <q-btn class="gradient-button" label="Cadastrar"  />
-    </div>
-    
+
+    <q-form @submit.prevent="onSubmit">
+        <div class="text-center q-pb-md border-style">
+            <q-avatar 
+                size="100px" 
+                font-size="52px"
+                color="grey-5"
+                text-color="white"
+                class="cursor-pointer"
+                @click="abrirModalAvatares = true"
+                style="border: 2px solid #8c52ff"
+            >
+                <img v-if="selectedAvatarUrl" :src="selectedAvatarUrl"/>
+                
+                <q-icon v-else name="person" size="lg" /> 
+                
+                <q-btn 
+                    icon="edit"
+                    color="grey-6"
+                    round
+                    size="sm"
+                    class="absolute-bottom-right"
+                    style="transform: translate(15%, 15%);"
+                />
+            </q-avatar>
+        </div>
+
+        <q-dialog v-model="abrirModalAvatares">
+            <ModalAvatares @close="abrirModalAvatares = false" />
+        </q-dialog>
+
+        <q-input dense outlined v-model="formData.matricula" label="Matrícula*" class="q-pb-sm" hide-bottom-space
+            bottom-slots type="tel" placeholder="Matrícula" :rules="[
+                val => (val && val.length > 0) || 'Campo obrigatório',
+                val => /^[0-9]+$/.test(val) || 'Use apenas números',
+                val => (val.length === 7 || val.length === 12) || 'A matrícula deve ter 7 (professor) ou 12 (aluno) dígitos'
+            ]" maxlength="12" lazy-rules>
+            <template v-slot:prepend>
+                <q-icon name="check" />
+            </template>
+        </q-input>
+
+        <q-input dense outlined v-model="formData.nome" label="Nome*" class="q-pb-sm" hide-bottom-space :rules="[
+            val => (val && val.length > 0) || 'Campo obrigatório'
+        ]" bottom-slots>
+            <template v-slot:prepend>
+                <q-icon name="person" />
+            </template>
+        </q-input>
+
+        <q-input dense outlined v-model="formData.nickname" label="Nickname" class="q-pb-sm" hide-bottom-space
+            bottom-slots>
+            <template v-slot:prepend>
+                <q-icon name="person" />
+            </template>
+        </q-input>
+
+        <q-input dense outlined v-model="formData.senha" :type="isSenhaVisible ? 'text' : 'password'" label="Senha*"
+            class="q-pb-sm" hide-bottom-space lazy-rules :rules="[
+                val => (val && val.length > 0) || 'Campo obrigatório',
+                val => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres']">
+            <template v-slot:prepend>
+                <q-icon name="lock" />
+            </template>
+
+            <template v-slot:append>
+                <q-icon v-if="formData.senha" name="close" @click="formData.senha = ''" class="cursor-pointer" />
+                <q-icon :name="isSenhaVisible ? 'visibility' : 'visibility_off'" class="cursor-pointer"
+                    @click="isSenhaVisible = !isSenhaVisible" />
+            </template>
+        </q-input>
+
+        <q-input dense outlined v-model="formData.confirmarSenha" :type="isConfirmarVisible ? 'text' : 'password'"
+            label="Confirmar senha*" class="q-pb-sm" hide-bottom-space lazy-rules :rules="[
+                val => (val && val.length > 0) || 'Campo obrigatório',
+                val => val === formData.senha || 'As senhas não são iguais'
+            ]">
+            <template v-slot:prepend>
+                <q-icon name="lock" />
+            </template>
+
+            <template v-slot:append>
+                <q-icon v-if="formData.confirmarSenha" name="close" @click="formData.confirmarSenha = ''"
+                    class="cursor-pointer" />
+                <q-icon :name="isConfirmarVisible ? 'visibility' : 'visibility_off'" class="cursor-pointer"
+                    @click="isConfirmarVisible = !isConfirmarVisible" />
+            </template>
+        </q-input>
+
+
+        <div class="text-center q-pt-md">
+            <q-btn class="gradient-button" label="Cadastrar" type="submit" />
+        </div>
+    </q-form>
 </template>
+
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
+import { api } from 'boot/axios'; // Importe da 'api' 
+import { useQuasar } from 'quasar'; // Para mostrar pop-ups (feedback)
+import { useRouter } from 'vue-router';// Para navegar após o cadastro
+import { useAvatarStore } from 'src/stores/avatarStore';
+import { useUserStore } from 'src/stores/userStore';
+import { storeToRefs } from 'pinia';
+import ModalAvatares from './modalAvatares.vue';
 
+const $q = useQuasar();
+const router = useRouter();
 
-const email = ref('');
-const password = ref('');
-const isPwd = ref(true);
+const avatarStore = useAvatarStore();
+const userStore = useUserStore();
+
+const { selectedAvatarUrl, selectedAvatarId } = storeToRefs(avatarStore);
+
+const formData = reactive({
+    matricula: '',
+    nome: '',
+    nickname: '',
+    senha: '',
+    confirmarSenha: ''
+});
+
+const isSenhaVisible = ref(false);
+const isConfirmarVisible = ref(false);
+
+const abrirModalAvatares = ref(false);
+
+async function onSubmit() {
+    // Decide qual URL chamar baseado no tamanho da matrícula
+    const isAluno = formData.matricula.length === 12;
+    const isProfessor = formData.matricula.length === 7;
+
+    const finalAvatarId = selectedAvatarId.value || "public/emptyBadgeSlot.png";
+
+    try {
+        let payload;
+        let url;
+        let tipoUsuario;
+
+        if (isAluno) {
+            // Monta o pacote de dados (payload) como a API de Aluno espera
+            url = '/alunos';
+            tipoUsuario = 'aluno';
+            payload = {
+                matricula: formData.matricula,
+                nome: formData.nome,
+                nickname: formData.nickname,
+                senha: formData.senha,
+                xp: 0,
+                nivel: 0,
+                icone: null,
+                avatar_id_fk: finalAvatarId // Valor padrão
+            };
+        } else if (isProfessor) {
+            // Monta o payload como a API de Professor espera
+            url = '/professores';
+            tipoUsuario = 'professor';
+            payload = {
+                matricula: formData.matricula,
+                nome: formData.nome,
+                senha: formData.senha,
+                avatar_id_fk: finalAvatarId // Valor padrão
+            };
+        } else {
+            throw new Error('Matrícula inválida.');
+        }
+        await api.post(url, payload);
+
+        userStore.setRole(tipoUsuario);
+
+        
+        $q.notify({
+            color: 'positive',
+            position: 'top',
+            message: 'Cadastro realizado com sucesso!',
+            icon: 'check_circle'
+        });
+
+        router.push('/home'); // Navega para a página inicial
+
+    } catch (error) {
+        // Erro se a matrícula já existe ou outro problema
+        console.error('Erro no cadastro:', error.response?.data?.detail || error.message);
+        $q.notify({
+            color: 'negative',
+            position: 'top',
+            message: error.response?.data?.detail || 'Falha no cadastro. Tente novamente.',
+            icon: 'report_problem'
+        });
+    }
+}
 </script>
 
 <style>
@@ -81,4 +203,5 @@ const isPwd = ref(true);
     width: 90%;
     border-radius: 8px;
 }
+
 </style>

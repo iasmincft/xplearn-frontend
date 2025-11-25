@@ -8,20 +8,23 @@ const basePath = '/atividades/'
 /** @returns {Promise<import('../types/atividade').Atividade[]>} */
 export async function listAtividades() {
   const { data } = await api.get(basePath)
-  return data
+  // Backend retorna { data: [...] } conforme AtividadeResponse
+  return data.data || data
 }
 
 /** @param {import('../types/atividade').CreateAtividadeDto} payload */
 export async function createAtividade(payload) {
   const { data } = await api.post(basePath, payload)
-  return data
+  // Backend retorna { data: {...} } conforme AtividadeResponseSingle
+  return data.data || data
 }
 
 /** @param {import('../types/atividade').UpdateAtividadeDto} payload */
 export async function updateAtividade(payload) {
   const { id, ...rest } = payload
   const { data } = await api.put(`${basePath}${id}`, { id, ...rest })
-  return data
+  // Backend retorna { data: {...} } conforme AtividadeResponseSingle
+  return data.data || data
 }
 
 /** @param {number|string} id */

@@ -9,20 +9,21 @@ export function useAtividades() {
 
   const atividades = computed(() => store.items)
   const pendentes = computed(() => store.atividadesPendentes)
-  const completas = computed(() => store.atividadesCompletas)
+  const vencidas = computed(() => store.atividadesVencidas)
   const loading = computed(() => store.loading)
   const error = computed(() => store.error)
 
   return {
     atividades,
     pendentes,
-    completas,
+    vencidas,
+    atividadesPorTurma: store.atividadesPorTurma,
+    atividadesPorBadge: store.atividadesPorBadge,
     loading,
     error,
     fetchAtividades: store.fetchAtividades,
     addAtividade: store.addAtividade,
     updateAtividade: store.updateAtividade,
     deleteAtividade: store.deleteAtividade,
-    alternarConcluida: store.alternarConcluida,
   }
 }

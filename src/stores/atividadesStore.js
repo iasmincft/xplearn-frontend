@@ -13,11 +13,29 @@ export const useAtividadesStore = defineStore('atividades', {
     error: null,
   }),
   getters: {
+    // Filtra atividades por data de entrega (pendentes = ainda não entregues)
     atividadesPendentes: (state) => {
-      return state.items.filter(atividade => !atividade.concluida)
+      const agora = new Date()
+      return state.items.filter(atividade => {
+        const dataEntrega = new Date(atividade.data_entrega)
+        return dataEntrega > agora
+      })
     },
-    atividadesCompletas: (state) => {
-      return state.items.filter(atividade => atividade.concluida)
+    // Atividades com data de entrega já passada
+    atividadesVencidas: (state) => {
+      const agora = new Date()
+      return state.items.filter(atividade => {
+        const dataEntrega = new Date(atividade.data_entrega)
+        return dataEntrega <= agora
+      })
+    },
+    // Filtra por turma
+    atividadesPorTurma: (state) => {
+      return (turmaId) => state.items.filter(a => a.turma_id_fk === turmaId)
+    },
+    // Filtra por badge
+    atividadesPorBadge: (state) => {
+      return (badgeId) => state.items.filter(a => a.badge_id_fk === badgeId)
     }
   },
   actions: {
@@ -35,14 +53,6 @@ export const useAtividadesStore = defineStore('atividades', {
       }
     },
 
-    async alternarConcluida(idParaAlternar) {
-      const atividade = this.items.find(item => item.id === idParaAlternar)
-      if (atividade) {
-        const atividadeModificada = { ...atividade, concluida: !atividade.concluida };
-        // Chamamos a ação principal de atualização
-        await this.updateAtividade(atividadeModificada);
-      }
-    },
     async addAtividade(novaAtividade) {
       try {
         const created = await createAtividade(novaAtividade)

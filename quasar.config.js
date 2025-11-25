@@ -94,7 +94,9 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: [
+        'Notify',
+      ],
 
       sassVariables: 'src/css/quasar.variables.scss'
     },

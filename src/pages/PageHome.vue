@@ -6,10 +6,13 @@
         <q-card-section>
           <div class="row items-center">
             <q-avatar size="100px">
-              <img src="https://cdn.quasar.dev/img/avatar.png"> </q-avatar>
+              <img :src="avatarStore.selectedAvatarUrl"
+              style="border-radius: 50px; border: 3px solid white "
+              > 
+            </q-avatar>
             <div class="q-ml-lg">
-              <div class="text-h4">Jane Doe</div>
-              <div class="text-grey-5">@janedoe</div>
+              <div class="text-h4">{{ userStore.currentUser?.nome }}</div>
+              <div class="text-grey-5">@{{userStore.currentUser?.nickname }}</div>
             </div>
             <q-space />
             <div class="col-xs-12 col-sm-5 q-pr-lg">
@@ -98,17 +101,38 @@
 <script setup>
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { useUserStore } from 'src/stores/userStore';
+import { useAvatarStore } from 'src/stores/avatarStore';
+import { onMounted, watch } from 'vue';
+
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
 import Turmas from "src/pages/PageTurmas.vue";
 
 const badgeStore = useBadgeStore();
 const userStore = useUserStore();
+const avatarStore = useAvatarStore();
 
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';
 
+const syncAvatar = async () => {
+  if (avatarStore.items.length === 0) {
+      await avatarStore.fetchAvatares();
+  }
+  if (userStore.currentUser?.avatar_id) {
+      avatarStore.setAvatar(userStore.currentUser.avatar_id);
+  }
+}
 
+onMounted(async () => {
+    await syncAvatar();
+});
+
+watch(() => userStore.currentUser?.avatar_id, (newId) => {
+    if (newId) {
+        syncAvatar();
+    }
+});
 
 </script>
 

@@ -5,7 +5,7 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '/home'
+        redirect: '/auth/login'
       },
       { 
         path: 'home', 
@@ -70,6 +70,14 @@ const routes = [
           }
         ]
       },
+      {
+        path: '/editarUsuario',
+        component: () => import('src/components/auth/user/editarUsuario.vue'),
+        meta: { 
+          title: 'Editar Usuário',
+          hideHeaderElement: true
+        }
+      }
         
     ]
   },

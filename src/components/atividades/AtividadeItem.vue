@@ -9,48 +9,23 @@
 
       <q-item-section>
         <q-item-label>{{ atividade.nome }}</q-item-label>
-        <q-item-label caption class="text-grey-5">Entrega: {{ atividade.data }}</q-item-label>
+        <q-item-label caption class="text-grey-5">Entrega: {{ formatarData(atividade.data_entrega) }}</q-item-label>
       </q-item-section>
 
       <q-item-section avatar>
-    <q-btn
-      v-if="userStore.isProfessor"
-      :class="{ 'bg-dark': menuAberto }"  
-      icon="more_horiz"
-      class="text-h5"
-      flat
-      dense
-      size="md"
-    />
-    <q-menu v-model="menuAberto" anchor="bottom right" self="bottom left" class="bg-dark q-pa-xs">
-      <q-item-section avatar>
-        <q-btn
-          v-if="userStore.isProfessor"
-          color="white"
-          icon="edit"
-          class="text-h5"
-          flat
-          dense
-          size="md"
-          label="Editar"
-          @click.stop="$emit('editar-atividade', atividade)"
-        />
+        <q-btn v-if="userStore.isProfessor" :class="{ 'bg-dark': menuAberto }" icon="more_horiz" class="text-h5" flat
+          dense size="md" />
+        <q-menu v-model="menuAberto" anchor="bottom right" self="bottom left" class="bg-dark q-pa-xs">
+          <q-item-section avatar>
+            <q-btn v-if="userStore.isProfessor" color="white" icon="edit" class="text-h5" flat dense size="md"
+              label="Editar" @click.stop="$emit('editar-atividade', atividade)" />
+          </q-item-section>
+          <q-item-section avatar>
+            <q-btn v-if="userStore.isProfessor" color="white" icon="delete" class="text-h5" flat dense size="md"
+              label="Deletar" @click.stop="$emit('deletar-atividade', atividade)" />
+          </q-item-section>
+        </q-menu>
       </q-item-section>
-      <q-item-section avatar>
-        <q-btn
-          v-if="userStore.isProfessor"
-          color="white"
-          icon="delete"
-          class="text-h5"
-          flat
-          dense
-          size="md"
-          label="Deletar"
-          @click.stop="$emit('deletar-atividade', atividade)"
-        />
-      </q-item-section>
-    </q-menu>
-  </q-item-section>
 
 
 
@@ -58,23 +33,29 @@
 
     <q-card class="bg-dark-page text-white q-pl-md" flat>
 
-      <q-card-section>
-        Descrição...
+      <q-card-section v-if="atividade.descricao">
+        <div class="text-body2">{{ atividade.descricao }}</div>
+      </q-card-section>
+      <q-card-section v-else>
+        <div class="text-body2 text-grey-5">Sem descrição</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <div class="row items-center">
+        <div class="row items-center q-gutter-md">
 
-          <div class="col q-mr-xl">
-            Valor:
+          <div class="col-auto">
+            <div class="text-caption text-grey-5">Nota Máxima:</div>
+            <div class="text-body1">{{ atividade.nota_max || '-' }}</div>
           </div>
 
-          <div class="col q-mr-xl">
-            Prêmio:
+          <div class="col-auto">
+            <div class="text-caption text-grey-5">Pontos XP:</div>
+            <div class="text-body1">{{ atividade.pontos || '-' }}</div>
           </div>
 
-          <div class="col">
-            Badge:
+          <div class="col-auto">
+            <div class="text-caption text-grey-5">Badge ID:</div>
+            <div class="text-body1">{{ atividade.badge_id_fk || '-' }}</div>
           </div>
 
         </div>
@@ -98,7 +79,19 @@ defineProps({
   }
 })
 const menuAberto = ref(false);
-defineEmits(['editar-atividade'])
+defineEmits(['editar-atividade', 'deletar-atividade'])
+
+function formatarData(dataISO) {
+  if (!dataISO) return ''
+  const data = new Date(dataISO)
+  return data.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
 </script>
 
 <style lang="scss">

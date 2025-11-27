@@ -8,9 +8,8 @@
       v-for="atividade in atividades" 
       :key="atividade.id" 
       :atividade="atividade"
-      @toggle-atividade="$emit('toggleAtividade', $event)"
-      @editar-atividade ="$emit('editar-atividade', $event)"
-      @deletar-atividade="promptToDelete" 
+      @editar-atividade="$emit('editar-atividade', $event)"
+      @deletar-atividade="$emit('deletar-atividade', $event)"
     />
   </transition-group>
 </template>
@@ -25,5 +24,5 @@ defineProps({
   }
 })
 
-defineEmits(['toggleAtividade', 'editar-atividade'])
+defineEmits(['editar-atividade', 'deletar-atividade'])
 </script>

@@ -19,15 +19,24 @@ export async function createAtividade(payload) {
   return data.data || data
 }
 
-/** @param {import('../types/atividade').UpdateAtividadeDto} payload */
+/** 
+ * Atualiza uma atividade existente
+ * @param {import('../types/atividade').UpdateAtividadeDto} payload - Deve conter o id e os campos a atualizar
+ * @returns {Promise<import('../types/atividade').Atividade>}
+ */
 export async function updateAtividade(payload) {
   const { id, ...rest } = payload
-  const { data } = await api.put(`${basePath}${id}`, { id, ...rest })
+
+  const { data } = await api.put(`${basePath}${id}`, rest)
   // Backend retorna { data: {...} } conforme AtividadeResponseSingle
   return data.data || data
 }
 
-/** @param {number|string} id */
+/** 
+ * Deleta uma atividade
+ * @param {number|string} id - ID da atividade a ser deletada
+ * @returns {Promise<void>}
+ */
 export async function deleteAtividade(id) {
   await api.delete(`${basePath}${id}`)
 }

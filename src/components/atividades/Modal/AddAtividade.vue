@@ -3,22 +3,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { useQuasar } from 'quasar';
 import { useAtividadesStore } from 'src/stores/atividadesStore'
 import AtividadeModal from './AtividadeModal.vue';
 
 const atividadesStore = useAtividadesStore();
-const dialogVisible = ref(true);
+const $q = useQuasar();
 const emit = defineEmits(['close']);
 
-function addAtividade(atividade) {
-    atividadesStore.addAtividade(atividade);
-    emit('close');
+async function addAtividade(atividade) {
+    try {
+        await atividadesStore.addAtividade(atividade);
+        $q.notify({
+            message: 'Atividade criada com sucesso!',
+            color: 'positive',
+            icon: 'check'
+        });
+        emit('close');
+    } catch (error) {
+        $q.notify({
+            message: 'Erro ao criar atividade: ' + (error.message || 'Erro desconhecido'),
+            color: 'negative',
+            icon: 'error'
+        });
+    }
 }
-
-const open = () => {
-    dialogVisible.value = false;
-};
-
-defineExpose({ open });
 </script>

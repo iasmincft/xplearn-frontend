@@ -3,12 +3,14 @@ import { listBadges, createBadge, updateBadge, deleteBadge } from 'src/services/
 
 export const useBadgeStore = defineStore('badge', {
   state: () => ({
-    items: [],
+    items: JSON.parse(localStorage.getItem('badge')) || [
+      { id: 1, nome: 'Mestre dos Algoritmos', badge: '/icons/iconxplearn.png' },
+    ],
     loading: false,
     error: null,
   }),
   getters: {
-    
+
   },
   actions: {
     async fetchBadges() {
@@ -19,13 +21,6 @@ export const useBadgeStore = defineStore('badge', {
       } catch (err) {
         this.error = 'Falha ao buscar badges da API.'
         console.error('Erro ao buscar badges:', err)
-        // Fallback para localStorage se API falhar
-        const localData = JSON.parse(localStorage.getItem('badge'))
-        if (localData) {
-          this.items = localData
-        } else {
-          this.items = [{ id: 1, nome: 'Mestre dos Algoritmos', badge: '/icons/iconxplearn.png' }]
-        }
       } finally {
         this.loading = false
       }

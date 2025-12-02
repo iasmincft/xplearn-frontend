@@ -4,23 +4,35 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useQuasar } from 'quasar';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
 import AtividadeModal from './AtividadeModal.vue';
 
 const atividadesStore = useAtividadesStore();
-const dialogVisible = ref(false);
+const $q = useQuasar();
 const editarAtividade = ref(null);
 const emit = defineEmits(['close']);
 
-
-function updateAtividade(atividade) {
-    atividadesStore.updateAtividade(atividade);
-    emit('close');
+async function updateAtividade(atividade) {
+    try {
+        await atividadesStore.updateAtividade(atividade);
+        $q.notify({
+            message: 'Atividade atualizada com sucesso!',
+            color: 'positive',
+            icon: 'check'
+        });
+        emit('close');
+    } catch (error) {
+        $q.notify({
+            message: 'Erro ao atualizar atividade: ' + (error.message || 'Erro desconhecido'),
+            color: 'negative',
+            icon: 'error'
+        });
+    }
 }
 
 const open = (atividade) => {
     editarAtividade.value = atividade;
-    dialogVisible.value = true;
 };
 
 defineExpose({ open });

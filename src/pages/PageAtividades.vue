@@ -10,9 +10,8 @@
         <q-tab-panel name="pendentes" class="q-pa-none">
           <q-scroll-area class="fit q-pa-md">
             <AtividadeLista 
-              v-if="atividadesStore.atividadesPendentes.length > 0"
+              v-if="atividadesStore.atividadesPendentes && atividadesStore.atividadesPendentes.length > 0"
               :atividades="atividadesStore.atividadesPendentes" 
-              @toggle-atividade="atividadesStore.alternarConcluida" 
               @editar-atividade="abrirModalEdicao"
               @deletar-atividade="promptToDelete"
             />
@@ -24,8 +23,12 @@
 
         <q-tab-panel name="concluidas" class="q-pa-none">
           <q-scroll-area class="fit q-pa-md">
-            <AtividadeLista v-if="atividadesStore.atividadesCompletas.length > 0"
-              :atividades="atividadesStore.atividadesCompletas" @toggle-atividade="atividadesStore.alternarConcluida" />
+            <AtividadeLista 
+              v-if="atividadesStore.atividadesVencidas && atividadesStore.atividadesVencidas.length > 0"
+              :atividades="atividadesStore.atividadesVencidas" 
+              @editar-atividade="abrirModalEdicao"
+              @deletar-atividade="promptToDelete"
+            />
             <div v-else class="fit flex flex-center text-center column">
               <div class="text-grey-5 q-mt-md">Nada por aqui.</div>
             </div>
@@ -75,24 +78,29 @@ onMounted(() => {
   atividadesStore.fetchAtividades(); // Carrega os dados da API
 });
 
-const promptToDelete = (id) => {
+const promptToDelete = (atividade) => {
+  // Extrai o ID se for um objeto ou usa diretamente se for um número
+  const id = atividade?.id || atividade
+  
   $q.dialog({
     title: 'Confirme para deletar',
-    message: 'Tem certeza que deseja deletar essa atividade?',
+    message: `Tem certeza que deseja deletar a atividade "${atividade?.nome || 'esta atividade'}"?`,
     ok: {
       push: true,
-      color: 'positive'
+      color: 'positive',
+      label: 'Deletar'
     },
     cancel: {
       color: 'negative',
-      push: true
+      push: true,
+      label: 'Cancelar'
     },
     persistent: true
   }).onOk(async () => {
     try {
         await atividadesStore.deleteAtividade(id); 
         $q.notify({
-            message: 'Atividade deletada!',
+            message: 'Atividade deletada com sucesso!',
             color: 'positive',
             icon: 'check'
         });
@@ -104,11 +112,7 @@ const promptToDelete = (id) => {
         });
     }
   }).onCancel(() => {
-    $q.notify({
-      message: 'Ação cancelada.',
-      color: 'info',
-      icon: 'cancel'
-    });
+    // Não precisa notificar quando cancela
   });
 };
 

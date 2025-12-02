@@ -1,4 +1,4 @@
-<template>
+  <template>
     <div class="row no-wrap justify-center items-center" style="height: 70px;">
         <div class="q-pr-md">
             <q-img src="icons/favicon-128x128.png" style="width: 38px;" />
@@ -11,13 +11,13 @@
         <div class="">Entre na sua conta para começar.</div>
     </div>
     <q-form @submit.prevent="onSubmit">
-        <q-input 
-            outlined 
-            v-model="formData.matricula" 
-            label="Matrícula" 
-            class="q-pb-sm" 
-            type="tel" 
-            placeholder="Matrícula" 
+        <q-input
+            outlined
+            v-model="formData.matricula"
+            label="Matrícula"
+            class="q-pb-sm"
+            type="tel"
+            placeholder="Matrícula"
             :rules="[
             val => (val && val.length > 0) || 'Campo obrigatório',
             val => /^[0-9]+$/.test(val) || 'Use apenas números',
@@ -32,18 +32,18 @@
                 <q-icon name="person" />
             </template>
         </q-input>
-        
-        <q-input 
-            outlined 
-            v-model="formData.senha" 
+
+        <q-input
+            outlined
+            v-model="formData.senha"
             :type="isSenhaVisible ? 'text' : 'password'"
-            label="Senha" 
-            class="q-pb-sm" 
+            label="Senha"
+            class="q-pb-sm"
             lazy-rules
             :rules="[
                 val => !!val || 'Insira a senha.',
                 val => val.length >= 6 || 'A senha deve ter pelo menos 6 caracteres.'
-            ]" 
+            ]"
             bottom-slots
             hide-bottom-space
         >
@@ -56,31 +56,31 @@
                     @click="isSenhaVisible = !isSenhaVisible" />
             </template>
         </q-input>
-        
+
         <div class="text-center q-pb-sm" >
             <q-btn class="gradient-button" label="Entrar" type="submit" />
         </div>
     </q-form>
     <div class="text-center q-pt-none">
-        <q-btn 
-            dense 
-            flat 
-            no-caps 
-            :ripple="false"  
-            label="Esqueceu a senha?" 
-            text-color="primary" 
+        <q-btn
+            dense
+            flat
+            no-caps
+            :ripple="false"
+            label="Esqueceu a senha?"
+            text-color="primary"
             style="text-decoration: underline;"
         />
         <div class="q-pt-md">
             Novo por aqui?
         </div>
-        <q-btn 
-            dense 
-            flat 
-            no-caps 
-            :ripple="false" 
-            label="Cadastre-se" 
-            text-color="primary" 
+        <q-btn
+            dense
+            flat
+            no-caps
+            :ripple="false"
+            label="Cadastre-se"
+            text-color="primary"
             style="text-decoration: underline;"
             to="/auth/cadastro"
         />

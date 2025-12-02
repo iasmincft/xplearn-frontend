@@ -8,15 +8,18 @@
             <q-avatar size="100px">
               <img :src="avatarStore.selectedAvatarUrl"
               style="border-radius: 50px; border: 3px solid white "
-              > 
+              >
             </q-avatar>
             <div class="q-ml-lg">
               <div class="text-h4">{{ userStore.currentUser?.nome }}</div>
-              <div class="text-grey-5">@{{userStore.currentUser?.nickname }}</div>
+              <div
+              class="text-grey-5"
+              v-if="userStore.currentUser?.nickname"
+              >@{{userStore.currentUser?.nickname }}</div>
             </div>
             <q-space />
             <div class="col-xs-12 col-sm-5 q-pr-lg">
-              <SecaoNivelXP 
+              <SecaoNivelXP
                 v-if="userStore.isAluno"
               />
             </div>
@@ -27,12 +30,12 @@
       <div class="row q-col-gutter-xl">
 
         <div class="col-12 col-md-7">
-          
+
           <div style="width: fit-content;">
             <div class="text-h5 q-pt-xl q-mb-md">Atividades</div>
               <q-card rounded class="bg-dark-page q-pa-sm" style="width: fit-content;" flat >
                 <q-list>
-                  <router-link 
+                  <router-link
                     style="text-decoration: none;"
                     :to="{ path: '/atividades', query: { tab: 'pendentes' } }"
                   >
@@ -88,7 +91,7 @@
             v-if="userStore.isAluno"
           />
 
-          <Turmas 
+          <Turmas
             v-if="userStore.isProfessor"
           />
 

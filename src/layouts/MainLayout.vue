@@ -26,21 +26,24 @@
           <div v-show="isExpanded" class="row no-wrap items-center">
             <div class="col q-pl-sm" style="width: 130px;">
               <div class="text-weight-bold ellipsis">{{ userStore.currentUser?.nome }}</div>
-              <div class="text-caption text-grey-5 ellipsis">@{{userStore.currentUser?.nickname }}</div>
+              <div
+              class="text-caption text-grey-5 ellipsis"
+              v-if="userStore.currentUser?.nickname"
+              >@{{userStore.currentUser?.nickname }}</div>
             </div>
             <div class="col-auto no-wrap">
-              <q-btn icon="more_vert" flat round dense > 
-                <q-menu 
-                  auto-close 
-                  anchor="top end" 
-                  self="bottom right" 
-                  class="bg-dark" 
-                  @mouseover="isMouseOverMenu = true" 
+              <q-btn icon="more_vert" flat round dense >
+                <q-menu
+                  auto-close
+                  anchor="top end"
+                  self="bottom right"
+                  class="bg-dark"
+                  @mouseover="isMouseOverMenu = true"
                   @mouseleave="handleMenuMouseLeave"
                   ref="userMenu"
                 >
                   <q-list dense class="bg-dark text-white q-pa-sm">
-                    
+
                     <q-item
                       clickable
                       v-close-popup
@@ -82,18 +85,18 @@
           {{ pageTitle }}
           <q-space />
           <div>
-            <q-btn-toggle 
-              v-model="userRole" 
-              class="my-custom-toggle" 
-              no-caps 
-              rounded 
-              unelevated 
+            <q-btn-toggle
+              v-model="userRole"
+              class="my-custom-toggle"
+              no-caps
+              rounded
+              unelevated
               toggle-color="primary"
-              color="white" 
-              text-color="primary" 
+              color="white"
+              text-color="primary"
               :options="[
-                { label: 'Aluno', value: 'aluno' }, 
-                { label: 'Professor', value: 'professor' }]" 
+                { label: 'Aluno', value: 'aluno' },
+                { label: 'Professor', value: 'professor' }]"
             />
           </div>
           <q-space />
@@ -167,7 +170,7 @@ const linksList = [
 ]
 
 const handleLogout = () => {
-  userStore.logout(router) 
+  userStore.logout(router)
 }
 
 const handleDrawerMouseLeave = () => {
@@ -175,7 +178,7 @@ const handleDrawerMouseLeave = () => {
     if (!isMouseOverMenu.value) {
       isExpanded.value = false;
       if (userMenu.value) {
-          userMenu.value.hide() 
+          userMenu.value.hide()
         }
     }
   }, 100);
@@ -187,7 +190,7 @@ const handleMenuMouseLeave = () => {
 }
 
 onMounted(async () => {
-  
+
     if (avatarStore.items.length === 0) {
         await avatarStore.fetchAvatares();
     }

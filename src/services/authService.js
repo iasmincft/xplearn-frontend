@@ -20,6 +20,19 @@ export async function login(credentials, role) {
   return responseData
 }
 
+export async function register(userData, role) {
+  const endpoint = role === 'aluno' ? '/aluno' : '/professor'
+  const { data } = await api.post(endpoint, userData)
+
+  const responseData = data.data || data
+  const token = responseData.access_token || responseData.token
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  }
+
+  return responseData
+}
+
 export function logout() {
   api.defaults.headers.common['Authorization'] = ''
 }

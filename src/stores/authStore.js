@@ -8,7 +8,7 @@ export const useAuthStore = defineStore('auth', {
     }),
 
     getters: {
-        isAuthenticated: (state) => !!state.token
+        isAuthenticated: (state) => !!state.token && state.token !== ''
     },
 
     actions: {
@@ -25,7 +25,7 @@ export const useAuthStore = defineStore('auth', {
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
             return true
-            
+
         },
 
         logout() {

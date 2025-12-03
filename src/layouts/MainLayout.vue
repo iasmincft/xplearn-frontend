@@ -195,8 +195,8 @@ onMounted(async () => {
         await avatarStore.fetchAvatares();
     }
 
-    if (userStore.isAluno && userStore.dadosDoAluno.avatar_id) {
-      avatarStore.setAvatar(userStore.dadosDoAluno.avatar_id);
+    if (userStore.isAluno && userStore.dadosDoAluno?.avatar_id) {
+      avatarStore.setAvatar(userStore.dadosDoAluno?.avatar_id);
     }
 });
 

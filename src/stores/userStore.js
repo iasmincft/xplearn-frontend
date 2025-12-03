@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { login as authLogin, logout as authLogout } from 'src/services/authService'
+import { login as authLogin, logout as authLogout, register as authRegister } from 'src/services/authService'
 import { getUserProfile } from 'src/services/userService'
 import { useAvatarStore } from './avatarStore'
 import { api } from 'src/boot/axios'
@@ -57,6 +57,35 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    async finishAuth(responseData, matricula, role) {
+
+      const token = responseData.access_token || responseData.token
+      if (token) {
+        this.token = token
+        localStorage.setItem('auth_token', token)
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      }
+
+      this.setRole(role)
+
+      const userData = responseData.nome ? responseData : null
+
+      if (userData && userData.nome) {
+        this.setDados(userData)
+      } else {
+        await this.fetchUserProfile(matricula, role)
+      }
+
+      // 4. Carregar Avatar
+      if (this.currentUser.avatar_id_fk) {
+        const avatarStore = useAvatarStore()
+        if (avatarStore.items.length === 0) {
+          await avatarStore.fetchAvatares()
+        }
+        avatarStore.setAvatar(this.currentUser.avatar_id_fk)
+      }
+    },
+
     async checkAuth() {
       if (!this.token) return false
 
@@ -76,7 +105,7 @@ export const useUserStore = defineStore('user', {
           return true
         } catch (error) {
           console.error('Sessão inválida ou expirada', error)
-          this.logout() // Se der erro (token expirado), faz logout
+          this.logout()
           return false
         }
       }
@@ -95,6 +124,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+
     async login(matricula, senha) {
       const userRole = matricula.length === 12 ? 'aluno' : (matricula.length === 7 ? 'professor' : null)
       if (!userRole) throw new Error('Matrícula inválida')
@@ -102,34 +132,9 @@ export const useUserStore = defineStore('user', {
       try {
         const responseData = await authLogin({ matricula, senha }, userRole)
 
-        const token = responseData.access_token || responseData.token
-        if(token) {
-          this.token = token
-          localStorage.setItem('auth_token', token)
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        }
+        // Chama a função compartilhada
+        await this.finishAuth(responseData, matricula, userRole)
 
-        this.setRole(userRole)
-
-        const userData = responseData.nome ? responseData : null
-
-        if (userData && userData.nome) {
-          this.setDados(userData)
-        } else {
-          // Se não vier os dados no login, busca o perfil
-          await this.fetchUserProfile(matricula, userRole)
-        }
-
-        if (this.currentUser.avatar_id_fk) {
-          const avatarStore = useAvatarStore()
-          if (avatarStore.items.length === 0) {
-            avatarStore.fetchAvatares().then(() => {
-              avatarStore.setAvatar(this.currentUser.avatar_id_fk)
-            })
-          } else {
-            avatarStore.setAvatar(this.currentUser.avatar_id_fk)
-          }
-        }
         return true
       } catch (error) {
         authLogout()
@@ -137,7 +142,30 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    logout(router) {
+    async register(userData, role) {
+        const responseData = await authRegister(userData, role)
+        await this.finishAuth(responseData, userData.matricula, role)
+        this.currentUser.nome = userData.nome || userData.name || this.currentUser.nome
+      this.currentUser.matricula = userData.matricula || this.currentUser.matricula
+
+      if (role === 'aluno') {
+        this.currentUser.nickname = userData.nickname || userData.nick || this.currentUser.nickname
+        this.currentUser.xp = 0 // Inicializa com 0 para garantir que apareça
+        this.currentUser.nivel = 1 // Inicializa com 1
+      }
+
+      // Se tiver avatar no form, garante ele também
+      if (userData.avatar_id_fk) {
+        this.currentUser.avatar_id_fk = userData.avatar_id_fk
+        const avatarStore = useAvatarStore()
+        if (avatarStore.items.length === 0) await avatarStore.fetchAvatares()
+        avatarStore.setAvatar(this.currentUser.avatar_id_fk)
+      }
+
+      return true
+    },
+
+    logout(router = null) {
       this.token = null
       this.currentUser = {
         role: null,
@@ -157,7 +185,9 @@ export const useUserStore = defineStore('user', {
       authLogout()
       const avatarStore = useAvatarStore()
       avatarStore.clearAvatar()
-      router.push('/auth/login')
+      if (router) {
+        router.push('/auth/login')
+      }
     }
   }
 })

@@ -9,7 +9,7 @@ import { api } from 'src/boot/axios'
 export async function login(credentials, role) {
   const { data } = await api.post(`/login/${role}`, credentials)
 
-  // Backend retorna { data: { access_token, ... } } conforme LoginAlunoResponse/LoginProfessorResponse
+
   const responseData = data.data || data
 
   const token = responseData.access_token || responseData.token

@@ -54,8 +54,17 @@
           </div>
 
           <div class="col-auto">
-            <div class="text-caption text-grey-5">Badge ID:</div>
-            <div class="text-body1">{{ atividade.badge_id_fk || '-' }}</div>
+            <div class="text-caption text-grey-5">Badge:</div>
+            <div v-if="atividade.badge" class="row items-center q-gutter-sm">
+              <q-img
+                :src="getBadgeSrc(atividade.badge)"
+                width="40px"
+                height="40px"
+                style="border-radius: 4px;"
+              >
+                <q-tooltip>{{ atividade.badge.nome }}</q-tooltip>
+              </q-img>
+            </div>
           </div>
 
         </div>
@@ -69,6 +78,8 @@
 <script setup>
 import { ref } from 'vue';
 import { useUserStore } from 'src/stores/userStore';
+import { api } from 'src/boot/axios';
+
 const userStore = useUserStore();
 
 
@@ -80,6 +91,21 @@ defineProps({
 })
 const menuAberto = ref(false);
 defineEmits(['editar-atividade', 'deletar-atividade'])
+
+const BASE_URL_AXIOS = api.defaults.baseURL;
+
+function getBadgeSrc(badge) {
+  if (!badge) return '';
+
+  const pathDoBanco = badge.caminho_foto;
+
+  if (pathDoBanco.startsWith('http')) return pathDoBanco;
+
+  const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
+  const path = pathDoBanco.startsWith('/') ? pathDoBanco : `/${pathDoBanco}`;
+
+  return `${baseUrl}/static${path}`;
+}
 
 function formatarData(dataISO) {
   if (!dataISO) return ''

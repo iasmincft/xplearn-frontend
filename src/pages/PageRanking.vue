@@ -1,48 +1,136 @@
 <template>
   <q-page class="q-pa-lg column no-wrap">
-    <div class="text-h5 q-pt-lg q-mb-md">Ranking da Turma</div>
+    
+    <div class="text-h5 q-pt-lg q-mb-md col-shrink">Ranking Geral</div>
+
+    <div v-if="rankingStore.loading" class="row justify-center q-pa-md">
+      <q-spinner color="primary" size="3em" />
+    </div>
+
     <q-table
-      :rows="rankingRows"
+      v-else
+      class="sticky-header-table"
+      :rows="formattedRows"
       :columns="rankingColumns"
-      row-key="aluno"
+      row-key="id"
       flat
       dark
-      card-class="bg-dark"
-      hide-header
       hide-bottom
+      card-class="bg-dark-page q-mx-xl"
       separator="none"
+      virtual-scroll
+      :virtual-scroll-item-size="48"
+      :pagination="{ rowsPerPage: 0 }" 
+      :rows-per-page-options="[0]"
     >
-    <template v-slot:body="props">
-      <q-tr :props="props" :class="{ 'bg-primary text-white': props.row.aluno === 'Jane Doe (Voce)' }">
-        <q-td key="pos" :props="props">
-          <q-chip dense :color="props.row.chipColor" text-color="dark" class="text-weight-bold">{{ props.row.pos }}</q-chip>
-        </q-td>
-        <q-td key="aluno" :props="props">{{ props.row.aluno }}</q-td>
-        <q-td key="nivel" :props="props">{{ props.row.nivel }}</q-td>
-      </q-tr>
-    </template>
-  </q-table>
-  <div class="row justify-end q-mt-md">
-    <q-btn flat color="primary" label="Ver Ranking Completo" />
-  </div>
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          
+          <q-td key="pos" :props="props" style="width: 80px; min-width: 80px;">
+            <q-chip 
+              dense 
+              :color="props.row.chipColor" 
+              :text-color="props.row.chipColor === 'transparent' ? 'white' : 'dark'" 
+              class="text-weight-bold"
+            >
+              {{ props.row.pos }}
+            </q-chip>
+          </q-td>
+
+          <q-td key="aluno" :props="props">
+            {{ props.row.aluno }}
+          </q-td>
+
+          <q-td key="nivel" :props="props" class="text-right">
+            Lv. {{ props.row.nivel }} <span class="text-caption text-grey-5">({{ props.row.xp }} XP)</span>
+          </q-td>
+
+        </q-tr>
+      </template>
+
+    </q-table>
+
+    <div v-if="!rankingStore.loading && rankingStore.items.length === 0" class="text-center text-grey q-mt-md">
+      Nenhum aluno no ranking ainda.
+    </div>
+
   </q-page>
 </template>
 
 <script setup>
+import { onMounted, computed } from 'vue'
+import { useRankingStore } from 'src/stores/rankingStore'
 
-import { ref } from 'vue'
-
+const rankingStore = useRankingStore()
 
 const rankingColumns = [
-  { name: 'pos', align: 'left', label: 'POS.', field: 'pos' },
+  { name: 'pos', align: 'left', label: 'POS.', field: 'pos', style: 'width: 80px; min-width: 80px' },
   { name: 'aluno', align: 'left', label: 'ALUNO', field: 'aluno' },
-  { name: 'nivel', align: 'right', label: 'NÍVEL', field: 'nivel' },
+  { name: 'nivel', align: 'right', label: 'NÍVEL (XP)', field: 'nivel' },
 ]
-const rankingRows = ref([
-  { pos: '1º', aluno: 'Ana Maria Silva', nivel: 10, chipColor: 'amber-6' },
-  { pos: '2º', aluno: 'João Paulo Santos', nivel: 8, chipColor: 'blue-grey-3' },
-  { pos: '3º', aluno: 'Laura Prado', nivel: 6, chipColor: 'deep-orange-4' },
-  { pos: '4º', aluno: 'Pedro Toledo', nivel: 4, chipColor: 'transparent' },
-  { pos: '10º', aluno: 'Jane Doe (Voce)', nivel: 'X', chipColor: 'transparent' },
-])
+
+const getChipColor = (index) => {
+  switch (index) {
+    case 0: return 'amber-6'
+    case 1: return 'grey-5'
+    case 2: return 'brown-5'
+    default: return 'transparent'
+  }
+}
+
+// Lista simples para a tabela
+const formattedRows = computed(() => {
+  if (!rankingStore.items) return []
+  
+  return rankingStore.items.map((item, index) => {
+    return {
+      id: item.id || item.matricula, 
+      pos: `${index + 1}º`,
+      aluno: item.nome,
+      nivel: item.nivel,
+      xp: item.xp,
+      chipColor: getChipColor(index)
+    }
+  })
+})
+
+onMounted(async () => {
+  await rankingStore.fetchRanking()
+})
 </script>
+
+<style lang="sass">
+.sticky-header-table 
+  height: 530px
+  max-height: calc(100vh - 200px)
+
+  &::-webkit-scrollbar
+    width: 8px
+    height: 8px
+  
+  &::-webkit-scrollbar-track
+    background: transparent
+
+  &::-webkit-scrollbar-thumb
+    background: #027be3
+    border-radius: 9px
+    opacity: 0.2
+
+  /* Remove padding padrão do rodapé do Quasar */
+  .q-table__bottom
+    padding: 0
+    border-top: none
+
+  .q-table__top,
+  thead tr:first-child th
+    background-color: #162646 
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  thead tr:first-child th
+    top: 0
+    
+  .q-table__middle
+    max-height: inherit
+</style>

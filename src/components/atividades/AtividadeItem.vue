@@ -45,17 +45,17 @@
 
           <div class="col-auto">
             <div class="text-caption text-grey-5">Nota Máxima:</div>
-            <div class="text-body1">{{ atividade.nota_max || '-' }}</div>
+            <div class="text-body1" style="line-height: 40px">{{ atividade.nota_max || '-' }}</div>
           </div>
 
           <div class="col-auto">
             <div class="text-caption text-grey-5">Pontos XP:</div>
-            <div class="text-body1">{{ atividade.pontos || '-' }}</div>
+            <div class="text-body1" style="line-height: 40px">{{ atividade.pontos || '-' }}</div>
           </div>
 
           <div class="col-auto">
             <div class="text-caption text-grey-5">Badge:</div>
-            <div v-if="atividade.badge" class="row items-center q-gutter-sm">
+            <div v-if="atividade.badge" >
               <q-img
                 :src="getBadgeSrc(atividade.badge)"
                 width="40px"

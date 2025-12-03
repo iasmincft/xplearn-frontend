@@ -19,19 +19,40 @@
           </q-img>
         </div>
       </div>
+    
+      <div class="text-h5 q-pt-xl">Badges disponíveis</div>
+      <div class="row q-pt-md q-gutter-sm">
+        <div
+          v-for="index in maxSlots"
+          :key="`slot-${index}`"
+        >
+          <q-img
+            :src="getBadgeImage(index - 1)"
+            width="100px"
+            height="100px"
+            style="border-radius: 8px;"
+          >
+            <q-tooltip>
+              {{ getBadgeName(index - 1) }}
+            </q-tooltip>
+          </q-img>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 
 <script setup>
-import { onMounted  } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { api } from 'src/boot/axios';
 
 
 const badgeStore = useBadgeStore();
 
-const maxSlots = 20;
+const maxSlots= computed(() => {
+  return badgeStore.items ? badgeStore.items.length : 0;
+});
 const emptySlot = '/emptyBadgeSlot.png'
 
 const BASE_URL_AXIOS = api.defaults.baseURL;

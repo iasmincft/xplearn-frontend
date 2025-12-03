@@ -3,14 +3,14 @@
  * @property {number} id
  * @property {string} nome
  * @property {string} requisito
- * @property {string} icone - URL ou caminho da imagem do badge
+ * @property {string} caminho_foto - URL ou caminho da imagem do badge
  */
 
 /**
  * @typedef {Object} CreateBadgeDto
  * @property {string} nome
  * @property {string} requisito
- * @property {string} icone
+ * @property {string} caminho_foto
  */
 
 /**
@@ -18,7 +18,7 @@
  * @property {number|string} id
  * @property {string} [nome]
  * @property {string} [requisito]
- * @property {string} [icone]
+ * @property {string} [caminho_foto]
  */
 
 /**

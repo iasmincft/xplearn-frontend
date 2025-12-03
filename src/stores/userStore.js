@@ -11,10 +11,10 @@ export const useUserStore = defineStore('user', {
       role: localStorage.getItem('user_role') || null,
       avatar_id_fk: null,
       nome: '',
-      nickname: '', // Apenas para alunos
+      nickname: '', 
       icone: null,
-      xp: 0, // Apenas para alunos
-      nivel: 1, // Apenas para alunos
+      xp: 0,
+      nivel: 1,
       matricula: localStorage.getItem('user_matricula') || ''
     }
   }),
@@ -75,8 +75,7 @@ export const useUserStore = defineStore('user', {
       } else {
         await this.fetchUserProfile(matricula, role)
       }
-
-      // 4. Carregar Avatar
+      
       if (this.currentUser.avatar_id_fk) {
         const avatarStore = useAvatarStore()
         if (avatarStore.items.length === 0) {
@@ -93,10 +92,7 @@ export const useUserStore = defineStore('user', {
 
       if (this.currentUser.matricula && this.currentUser.role) {
         try {
-          // Busca os dados atualizados do backend
           await this.fetchUserProfile(this.currentUser.matricula, this.currentUser.role)
-
-          // Carrega o avatar se necessário
           if (this.currentUser.avatar_id_fk) {
             const avatarStore = useAvatarStore()
             if (avatarStore.items.length === 0) await avatarStore.fetchAvatares()
@@ -132,7 +128,6 @@ export const useUserStore = defineStore('user', {
       try {
         const responseData = await authLogin({ matricula, senha }, userRole)
 
-        // Chama a função compartilhada
         await this.finishAuth(responseData, matricula, userRole)
 
         return true
@@ -150,18 +145,16 @@ export const useUserStore = defineStore('user', {
 
       if (role === 'aluno') {
         this.currentUser.nickname = userData.nickname || userData.nick || this.currentUser.nickname
-        this.currentUser.xp = 0 // Inicializa com 0 para garantir que apareça
-        this.currentUser.nivel = 1 // Inicializa com 1
+        this.currentUser.xp = 0
+        this.currentUser.nivel = 1 
       }
 
-      // Se tiver avatar no form, garante ele também
       if (userData.avatar_id_fk) {
         this.currentUser.avatar_id_fk = userData.avatar_id_fk
         const avatarStore = useAvatarStore()
         if (avatarStore.items.length === 0) await avatarStore.fetchAvatares()
         avatarStore.setAvatar(this.currentUser.avatar_id_fk)
       }
-
       return true
     },
 

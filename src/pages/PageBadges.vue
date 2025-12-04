@@ -1,25 +1,28 @@
 <template>
   <q-page class="q-pa-lg column no-wrap">
     <div class="q-pl-xl">
-      <div class="text-h5">Conquistados</div>
-      <div class="row q-pt-md q-gutter-sm">
+      <div class="text-h5">Minhas Conquistas</div>
+      <div v-if="userBadges.length === 0" class="q-pt-md text-grey">
+        Nenhum badge conquistado ainda.
+      </div>
+      <div v-else class="row q-pt-md q-gutter-sm">
         <div
-          v-for="index in maxSlots"
-          :key="`slot-${index}`"
+          v-for="badge in userBadges"
+          :key="`user-badge-${badge.id}`"
         >
           <q-img
-            :src="getBadgeImage(index - 1)"
+            :src="getBadgeImage(badge)"
             width="100px"
             height="100px"
             style="border-radius: 8px;"
           >
             <q-tooltip>
-              {{ getBadgeName(index - 1) }}
+              {{ badge.nome }}
             </q-tooltip>
           </q-img>
         </div>
       </div>
-    
+
       <div class="text-h5 q-pt-xl">Badges disponíveis</div>
       <div class="row q-pt-md q-gutter-sm">
         <div
@@ -43,17 +46,17 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { api } from 'src/boot/axios';
 
 
 const badgeStore = useBadgeStore();
-
+const userBadges = ref([]);
+const emptySlot = '/emptyBadgeSlot.png'
 const maxSlots= computed(() => {
   return badgeStore.items ? badgeStore.items.length : 0;
 });
-const emptySlot = '/emptyBadgeSlot.png'
 
 const BASE_URL_AXIOS = api.defaults.baseURL;
 

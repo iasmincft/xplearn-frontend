@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-lg column no-wrap">
-    
+
     <div class="text-h5 q-pt-lg q-mb-md col-shrink">Ranking Geral</div>
 
     <div v-if="rankingStore.loading" class="row justify-center q-pa-md">
@@ -20,17 +20,20 @@
       separator="none"
       virtual-scroll
       :virtual-scroll-item-size="48"
-      :pagination="{ rowsPerPage: 0 }" 
+      :pagination="{ rowsPerPage: 0 }"
       :rows-per-page-options="[0]"
     >
       <template v-slot:body="props">
-        <q-tr :props="props">
-          
+        <q-tr
+          :props="props"
+          @click="openStudentDetails(props.row)"
+          >
+
           <q-td key="pos" :props="props" style="width: 80px; min-width: 80px;">
-            <q-chip 
-              dense 
-              :color="props.row.chipColor" 
-              :text-color="props.row.chipColor === 'transparent' ? 'white' : 'dark'" 
+            <q-chip
+              dense
+              :color="props.row.chipColor"
+              :text-color="props.row.chipColor === 'transparent' ? 'white' : 'dark'"
               class="text-weight-bold"
             >
               {{ props.row.pos }}
@@ -54,14 +57,21 @@
       Nenhum aluno no ranking ainda.
     </div>
 
+    <q-dialog v-model="showDetailsDialog">
+      <view-aluno-ranking :student="selectedStudent" />
+    </q-dialog>
+
   </q-page>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRankingStore } from 'src/stores/rankingStore'
+import viewAlunoRanking from 'src/components/alunoRanking/viewAlunoRanking.vue'
 
 const rankingStore = useRankingStore()
+const showDetailsDialog = ref(false)
+const selectedStudent = ref(null)
 
 const rankingColumns = [
   { name: 'pos', align: 'left', label: 'POS.', field: 'pos', style: 'width: 80px; min-width: 80px' },
@@ -78,18 +88,19 @@ const getChipColor = (index) => {
   }
 }
 
-// Lista simples para a tabela
 const formattedRows = computed(() => {
   if (!rankingStore.items) return []
-  
+
   return rankingStore.items.map((item, index) => {
     return {
-      id: item.id || item.matricula, 
+      id: item.id || item.matricula,
       pos: `${index + 1}º`,
       aluno: item.nome,
       nivel: item.nivel,
       xp: item.xp,
-      chipColor: getChipColor(index)
+      chipColor: getChipColor(index),
+      avatar: item.caminho_foto || null,
+      badges: item.badges || []
     }
   })
 })
@@ -97,17 +108,23 @@ const formattedRows = computed(() => {
 onMounted(async () => {
   await rankingStore.fetchRanking()
 })
+
+const openStudentDetails = (row) => {
+  selectedStudent.value = row
+  showDetailsDialog.value = true
+  }
+
 </script>
 
 <style lang="sass">
-.sticky-header-table 
+.sticky-header-table
   height: 530px
   max-height: calc(100vh - 200px)
 
   &::-webkit-scrollbar
     width: 8px
     height: 8px
-  
+
   &::-webkit-scrollbar-track
     background: transparent
 
@@ -123,14 +140,14 @@ onMounted(async () => {
 
   .q-table__top,
   thead tr:first-child th
-    background-color: #162646 
+    background-color: #162646
 
   thead tr th
     position: sticky
     z-index: 1
   thead tr:first-child th
     top: 0
-    
+
   .q-table__middle
     max-height: inherit
 </style>

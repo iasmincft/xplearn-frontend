@@ -17,6 +17,10 @@
           dense size="md" />
         <q-menu v-model="menuAberto" anchor="bottom right" self="bottom left" class="bg-dark q-pa-xs">
           <q-item-section avatar>
+            <q-btn v-if="userStore.isProfessor" color="white" icon="visibility" class="text-h5" flat dense size="md"
+              label="Visualizar" @click.stop="$emit('view-atividade', atividade)" />
+          </q-item-section>
+          <q-item-section avatar>
             <q-btn v-if="userStore.isProfessor" color="white" icon="edit" class="text-h5" flat dense size="md"
               label="Editar" @click.stop="$emit('editar-atividade', atividade)" />
           </q-item-section>

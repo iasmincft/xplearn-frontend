@@ -25,7 +25,7 @@ export async function getProfessorProfile(matricula) {
  * @returns {Promise<import('../types/user').Aluno|import('../types/user').Professor>}
  */
 export async function getUserProfile(matricula, role) {
-  return role === 'aluno' 
+  return role === 'aluno'
     ? getAlunoProfile(matricula)
     : getProfessorProfile(matricula)
 }

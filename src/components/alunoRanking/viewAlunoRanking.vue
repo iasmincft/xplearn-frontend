@@ -7,7 +7,7 @@
       round
       dense
       color="grey-4"
-      class="absolute-top-left q-ma-sm"
+      class=" q-ma-sm"
       v-close-popup
     />
 
@@ -16,8 +16,8 @@
       <q-avatar size="100px" class="shadow-5 q-mb-md bg-grey-9" style="border: 3px solid #027be3;">
 
         <img
-          v-if="resolveAvatarImage(student.avatar)"
-          :src="resolveAvatarImage(student.avatar)"
+          v-if="student.avatar"
+          :src="resolveImage(student.avatar.caminho_foto)"
         >
 
         <q-icon v-else name="person" size="60px" color="grey-5" />
@@ -35,15 +35,15 @@
     <q-card-section v-if="student">
       <div class="text-subtitle2 q-mb-sm">Badges Conquistados</div>
 
-      <div v-if="student.badges && student.badges.length > 0" class="row q-gutter-sm justify-center">
+      <div v-if="student.badges && student.badges.length > 0" class="row q-gutter-sm q-pl-md">
         <div v-for="badge in student.badges" :key="badge.id">
           <q-img
-            :src="resolveBadgeImage(badge.caminho_foto)"
+            :src="resolveImage(badge.caminho_foto)"
             width="50px"
             height="50px"
             style="border-radius: 6px;"
           >
-            <q-tooltip>{{ badge.nome }}</q-tooltip>
+            <q-tooltip>{{ badge.caminho_foto }}</q-tooltip>
           </q-img>
         </div>
       </div>
@@ -69,7 +69,7 @@ defineProps({
 
 const BASE_URL_AXIOS = api.defaults.baseURL;
 
-const resolveAvatarImage = (path) => {
+const resolveImage = (path) => {
 
   if (!path) return null;
 
@@ -80,6 +80,9 @@ const resolveAvatarImage = (path) => {
 
   return `${baseUrl}/static${cleanPath}`;
 };
+
+
+
 
 </script>
 

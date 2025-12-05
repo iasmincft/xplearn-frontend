@@ -31,11 +31,11 @@ export const useAtividadesStore = defineStore('atividades', {
     },
     // Filtra por turma
     atividadesPorTurma: (state) => {
-      return (turmaId) => state.items.filter(a => a.turma_id_fk === turmaId)
+      return (turmaId) => state.items.filter(a => a.turma.id === turmaId)
     },
     // Filtra por badge
     atividadesPorBadge: (state) => {
-      return (badgeId) => state.items.filter(a => a.badge_id_fk === badgeId)
+      return (badgeId) => state.items.filter(a => a.badge.id === badgeId)
     }
   },
   actions: {

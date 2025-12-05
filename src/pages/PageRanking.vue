@@ -99,7 +99,7 @@ const formattedRows = computed(() => {
       nivel: item.nivel,
       xp: item.xp,
       chipColor: getChipColor(index),
-      avatar: item.caminho_foto || null,
+      avatar: item.avatar || null,
       badges: item.badges || []
     }
   })

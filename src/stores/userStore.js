@@ -11,7 +11,7 @@ export const useUserStore = defineStore('user', {
       role: localStorage.getItem('user_role') || null,
       avatar_id_fk: null,
       nome: '',
-      nickname: '', 
+      nickname: '',
       icone: null,
       xp: 0,
       nivel: 1,
@@ -75,7 +75,7 @@ export const useUserStore = defineStore('user', {
       } else {
         await this.fetchUserProfile(matricula, role)
       }
-      
+
       if (this.currentUser.avatar_id_fk) {
         const avatarStore = useAvatarStore()
         if (avatarStore.items.length === 0) {
@@ -146,7 +146,7 @@ export const useUserStore = defineStore('user', {
       if (role === 'aluno') {
         this.currentUser.nickname = userData.nickname || userData.nick || this.currentUser.nickname
         this.currentUser.xp = 0
-        this.currentUser.nivel = 1 
+        this.currentUser.nivel = 1
       }
 
       if (userData.avatar_id_fk) {
@@ -180,6 +180,17 @@ export const useUserStore = defineStore('user', {
       avatarStore.clearAvatar()
       if (router) {
         router.push('/auth/login')
+      }
+    },
+
+    addXp(quantidade) {
+      if (this.currentUser.role !== 'aluno') return
+
+      this.currentUser.xp += quantidade
+
+      while (this.currentUser.xp >= 1000) {
+        this.currentUser.xp -= 1000
+        this.currentUser.nivel += 1
       }
     }
   }

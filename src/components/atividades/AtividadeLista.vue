@@ -4,9 +4,9 @@
     leave-active-class="animated zoomOut"
     tag="div"
   >
-    <AtividadeItem 
-      v-for="atividade in atividades" 
-      :key="atividade.id" 
+    <AtividadeItem
+      v-for="atividade in atividades"
+      :key="atividade.id"
       :atividade="atividade"
       @editar-atividade="$emit('editar-atividade', $event)"
       @deletar-atividade="$emit('deletar-atividade', $event)"

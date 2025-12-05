@@ -6,27 +6,14 @@
 
     <q-form @submit.prevent="onSubmit">
         <div class="text-center q-pb-md border-style">
-            <q-avatar 
-                size="100px" 
-                font-size="52px"
-                color="grey-5"
-                text-color="white"
-                class="cursor-pointer"
-                @click="abrirModalAvatares = true"
-                style="border: 2px solid #8c52ff"
-            >
-                <img v-if="selectedAvatarUrl" :src="selectedAvatarUrl"/>
-                
-                <q-icon v-else name="person" size="lg" /> 
-                
-                <q-btn 
-                    icon="edit"
-                    color="grey-6"
-                    round
-                    size="sm"
-                    class="absolute-bottom-right"
-                    style="transform: translate(15%, 15%);"
-                />
+            <q-avatar size="100px" font-size="52px" color="grey-5" text-color="white" class="cursor-pointer"
+                @click="abrirModalAvatares = true" style="border: 2px solid #8c52ff">
+                <img v-if="selectedAvatarUrl" :src="selectedAvatarUrl" />
+
+                <q-icon v-else name="person" size="lg" />
+
+                <q-btn icon="edit" color="grey-6" round size="sm" class="absolute-bottom-right"
+                    style="transform: translate(15%, 15%);" />
             </q-avatar>
         </div>
 
@@ -105,7 +92,6 @@ import { api } from 'boot/axios'; // Importe da 'api'
 import { useQuasar } from 'quasar'; // Para mostrar pop-ups (feedback)
 import { useRouter } from 'vue-router';// Para navegar após o cadastro
 import { useAvatarStore } from 'src/stores/avatarStore';
-import { useUserStore } from 'src/stores/userStore';
 import { storeToRefs } from 'pinia';
 import ModalAvatares from './modalAvatares.vue';
 
@@ -113,7 +99,6 @@ const $q = useQuasar();
 const router = useRouter();
 
 const avatarStore = useAvatarStore();
-const userStore = useUserStore();
 
 const { selectedAvatarUrl, selectedAvatarId } = storeToRefs(avatarStore);
 
@@ -140,12 +125,10 @@ async function onSubmit() {
     try {
         let payload;
         let url;
-        let tipoUsuario;
 
         if (isAluno) {
             // Monta o pacote de dados (payload) como a API de Aluno espera
             url = '/alunos';
-            tipoUsuario = 'aluno';
             payload = {
                 matricula: formData.matricula,
                 nome: formData.nome,
@@ -159,7 +142,6 @@ async function onSubmit() {
         } else if (isProfessor) {
             // Monta o payload como a API de Professor espera
             url = '/professores';
-            tipoUsuario = 'professor';
             payload = {
                 matricula: formData.matricula,
                 nome: formData.nome,
@@ -171,17 +153,14 @@ async function onSubmit() {
         }
         await api.post(url, payload);
 
-        userStore.setRole(tipoUsuario);
-
-        
         $q.notify({
             color: 'positive',
             position: 'top',
-            message: 'Cadastro realizado com sucesso!',
+            message: 'Cadastro realizado com sucesso! Faça login para continuar.',
             icon: 'check_circle'
         });
 
-        router.push('/home'); // Navega para a página inicial
+        router.push('/auth/login');
 
     } catch (error) {
         // Erro se a matrícula já existe ou outro problema
@@ -203,5 +182,4 @@ async function onSubmit() {
     width: 90%;
     border-radius: 8px;
 }
-
 </style>

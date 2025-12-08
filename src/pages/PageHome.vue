@@ -128,7 +128,7 @@ const syncAvatar = async () => {
 }
 
 onMounted(async () => {
-  await syncAvatar();
+    await syncAvatar();
 });
 
 watch(() => userStore.currentUser?.avatar_id, (newId) => {

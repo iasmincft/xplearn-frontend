@@ -6,6 +6,7 @@ const basePath = '/avatares/'
 const BASE_URL_AXIOS = api.defaults.baseURL
 
 const getFullPath = (caminhoFoto) => {
+  if (!caminhoFoto) return '';
   const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS
   const path = caminhoFoto.startsWith('/') ? caminhoFoto : `/${caminhoFoto}`
   return `${baseUrl}/static${path}`
@@ -23,6 +24,9 @@ export async function listAvatares() {
  * @returns {string}
  */
 export function getAvatarFullUrl(avatar) {
+  if (!avatar || !avatar.caminho_foto) {
+      return '';
+  }
   return getFullPath(avatar.caminho_foto)
 }
 

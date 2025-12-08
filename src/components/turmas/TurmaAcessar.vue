@@ -68,13 +68,14 @@ const turmaId = Number(route.params.id);
 
 const turma = computed(() => turmaStore.getTurmaById(turmaId));
 
+const alunos = computed(() => {
+    return turma.value?.alunos || [];
+});
+
 const atividades = computed(() => {
   return atividadesStore.atividadesPorTurma(turmaId);
 });
 
-const alunos = computed(() => {
-    return turma.value?.alunos_associados || [];
-});
 
 const BASE_URL_AXIOS = api.defaults.baseURL;
 const resolveAvatarPath = (path) => {
@@ -86,6 +87,9 @@ const resolveAvatarPath = (path) => {
 };
 
 onMounted(async () => {
+  if (turmaStore.items.length === 0) {
+      await turmaStore.fetchTurmas();
+  }
   await atividadesStore.fetchAtividades();
 });
 </script>

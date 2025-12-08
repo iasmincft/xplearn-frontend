@@ -1,26 +1,27 @@
 <template>
-  <q-layout view="lHh LpR lFf" >
+  <q-layout view="lHh LpR lFf">
+
     <q-drawer show-if-above :breakpoint="0" :width="isExpanded ? 250 : 60" @mouseover="isExpanded = true"
-    @mouseleave="handleDrawerMouseLeave" class="bg-dark-page text-white" v-if="!route.meta.hideHeaderAuth">
+      @mouseleave="handleDrawerMouseLeave" class="bg-dark-page text-white" v-if="!route.meta.hideHeaderAuth">
 
-    <q-list class="column full-height">
-      <div class="row no-wrap items-center" style="height: 70px;">
-        <div class="col-auto row justify-center items-center" style="width: 60px;">
-          <q-img src="icons/favicon-128x128.png" style="width: 38px;" />
+      <q-list class="column full-height">
+        <div class="row no-wrap items-center" style="height: 70px;">
+          <div class="col-auto row justify-center items-center" style="width: 60px;">
+            <q-img src="icons/favicon-128x128.png" style="width: 38px;" />
+          </div>
+          <div class="col q-pl-md" style="width: 190px;">
+            <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+              <div v-show="isExpanded" class="text-weight-bold ellipsis text-white">{{ headerTitle }}</div>
+            </transition>
+          </div>
         </div>
-        <div class="col q-pl-md" style="width: 190px;">
-          <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-            <div v-show="isExpanded" class="text-weight-bold ellipsis text-white">{{ headerTitle }}</div>
-          </transition>
-        </div>
-      </div>
 
-      <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" :is-expanded="isExpanded" />
-      <q-space />
-      <div class="row full-width no-wrap items-end q-pb-lg" style="height: 70px;">
-        <div class="col-auto row justify-center items-center" style="width: 60px;">
-          <q-avatar size="40px">
-            <img :src="avatarStore.selectedAvatarUrl" style="border: 2px solid white"> </q-avatar>
+        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" :is-expanded="isExpanded" />
+        <q-space />
+        <div class="row full-width no-wrap items-end q-pb-lg" style="height: 70px;">
+          <div class="col-auto row justify-center items-center" style="width: 60px;">
+            <q-avatar size="40px">
+              <img :src="avatarStore.selectedAvatarUrl" style="border: 2px solid white"> </q-avatar>
           </div>
           <div v-show="isExpanded" class="row no-wrap items-center">
             <div class="col q-pl-sm" style="width: 130px;">
@@ -40,11 +41,11 @@
                   @mouseover="isMouseOverMenu = true"
                   @mouseleave="handleMenuMouseLeave"
                   ref="userMenu"
-                  >
+                >
                   <q-list dense class="bg-dark text-white q-pa-sm">
 
                     <q-item
-                    clickable
+                      clickable
                       v-close-popup
                       to="/editarUsuario"
                       class="text-white"
@@ -56,10 +57,10 @@
                     </q-item>
 
                     <q-item
-                    clickable
-                    v-close-popup
-                    @click="handleLogout"
-                    class="text-white "
+                      clickable
+                      v-close-popup
+                      @click="handleLogout"
+                      class="text-white "
                     >
                       <q-item-section avatar>
                         <q-icon name="delete" />
@@ -85,8 +86,8 @@
           <q-space />
           <div>
             <q-btn-toggle
-            v-model="userRole"
-            class="my-custom-toggle"
+              v-model="userRole"
+              class="my-custom-toggle"
               no-caps
               rounded
               unelevated

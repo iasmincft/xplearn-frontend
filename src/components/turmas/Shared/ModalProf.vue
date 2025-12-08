@@ -1,12 +1,12 @@
 <template>
-    <q-input 
-        autofocus 
-        :model-value="prof"  
+    <q-input
+        autofocus
+        :model-value="professor"
         @update:model-value="$emit('update:professor', $event)"
-        label="Nome Professor" 
+        label="Nome Professor"
         id="turma-professor"
         nome="turmaProfessor"
-        filled 
+        filled
         clearable
         :rules="[val => !!val || 'Campo obrigatório']"
         ref="professorInput"

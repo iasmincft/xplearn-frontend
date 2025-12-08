@@ -31,9 +31,11 @@ export const useAvatarStore = defineStore("avatar", {
         setAvatar(id) {
             this.selectedAvatarId = id;
             const avatar = this.items.find(a => a.id === id);
-            
+            console.log('Avatar encontrado para ID', id, ':', avatar);
+
             if (avatar) {
-                this.selectedAvatarUrl = getAvatarFullUrl(avatar);
+                console.log('Avatar selecionado:', avatar);
+                this.selectedAvatarUrl = getAvatarFullUrl(avatar.caminho_foto);
             }
         },
         clearAvatar() {

@@ -74,7 +74,7 @@ watch(localTurma, (newVal) => {
 function saveTurma() {
     formRef.value.validate().then((success) => {
         if (success) {
-            emit('save-atividade', { ...localTurma });
+            emit('save-turma', { ...localTurma });
             emit('close');
         } else {
             $q.notify({

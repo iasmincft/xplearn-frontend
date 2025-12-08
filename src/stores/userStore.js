@@ -9,9 +9,10 @@ export const useUserStore = defineStore('user', {
     token: localStorage.getItem('auth_token') || null,
     currentUser: {
       role: localStorage.getItem('user_role') || null,
+      avatar: null,
       avatar_id_fk: null,
       nome: '',
-      nickname: '', 
+      nickname: '',
       icone: null,
       xp: 0,
       nivel: 1,
@@ -21,7 +22,8 @@ export const useUserStore = defineStore('user', {
   getters: {
     isProfessor: (state) => state.currentUser.role === 'professor',
     isAluno: (state) => state.currentUser.role === 'aluno',
-    isAuthenticated: (state) => !!state.token
+    isAuthenticated: (state) => !!state.token,
+    dadosDoAluno: (state) => state.currentUser
   },
   actions: {
     setRole(newRole) {
@@ -38,18 +40,22 @@ export const useUserStore = defineStore('user', {
         this.currentUser.avatar_id_fk = userData.avatar_id_fk ?? this.currentUser.avatar_id_fk
         this.currentUser.icone = userData.icone ?? this.currentUser.icone
 
-        //persistir login no localStorage ao atualizar a página
+        if(userData.avatar) {
+          this.currentUser.avatar = userData.avatar
+          this.currentUser.avatar_id_fk = userData.avatar.id
+        } else {
+          this.currentUser.avatar_id_fk = userData.avatar_id_fk ?? this.currentUser.avatar_id_fk
+        }
+
         if (this.currentUser.matricula) {
             localStorage.setItem('user_matricula', this.currentUser.matricula)
         }
 
-        // Campos específicos de aluno
         if (this.currentUser.role === 'aluno') {
           this.currentUser.nickname = userData.nickname || this.currentUser.nickname
           this.currentUser.xp = userData.xp ?? this.currentUser.xp
           this.currentUser.nivel = userData.nivel ?? this.currentUser.nivel
         } else {
-          // Professor não tem nickname, xp, nivel
           this.currentUser.nickname = ''
           this.currentUser.xp = 0
           this.currentUser.nivel = 1
@@ -75,7 +81,7 @@ export const useUserStore = defineStore('user', {
       } else {
         await this.fetchUserProfile(matricula, role)
       }
-      
+
       if (this.currentUser.avatar_id_fk) {
         const avatarStore = useAvatarStore()
         if (avatarStore.items.length === 0) {
@@ -146,7 +152,7 @@ export const useUserStore = defineStore('user', {
       if (role === 'aluno') {
         this.currentUser.nickname = userData.nickname || userData.nick || this.currentUser.nickname
         this.currentUser.xp = 0
-        this.currentUser.nivel = 1 
+        this.currentUser.nivel = 1
       }
 
       if (userData.avatar_id_fk) {

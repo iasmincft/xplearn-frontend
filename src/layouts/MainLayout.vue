@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from 'stores/userStore'
 import { useAvatarStore } from 'src/stores/avatarStore';
@@ -167,37 +167,6 @@ const linksList = [
 
 ]
 
-const carregarAvatarPelaStore = async () => {
-  const user = userStore.dadosDoAluno;
-
-  if (!user) return;
-
-  let avatarId = user.avatar?.id || user.avatar_id_fk;
-
-  if (!avatarId) {
-    return;
-  }
-
-  if (avatarStore.items.length === 0) {
-    try {
-      await avatarStore.fetchAvatares();
-    } catch (e) {
-      console.error("Erro ao carregar avatares:", e);
-      return;
-    }
-  }
-
-  avatarStore.setAvatar(Number(avatarId));
-}
-
-watch(
-  () => userStore.currentUser,
-  () => {
-    carregarAvatarPelaStore();
-  },
-  { deep: true, immediate: true }
-);
-
 const handleLogout = () => {
   userStore.logout(router)
 }
@@ -217,9 +186,6 @@ const handleMenuMouseLeave = () => {
   isMouseOverMenu.value = false;
   isExpanded.value = false;
 }
-
-
-
 
 </script>
 

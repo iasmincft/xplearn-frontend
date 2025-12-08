@@ -106,7 +106,6 @@
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { useUserStore } from 'src/stores/userStore';
 import { useAvatarStore } from 'src/stores/avatarStore';
-import { onMounted, watch } from 'vue';
 
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
@@ -118,25 +117,6 @@ const avatarStore = useAvatarStore();
 
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';
-
-const syncAvatar = async () => {
-  if (avatarStore.items.length === 0) {
-      await avatarStore.fetchAvatares();
-  }
-  if (userStore.currentUser?.avatar_id) {
-      avatarStore.setAvatar(userStore.currentUser.avatar_id);
-  }
-}
-
-onMounted(async () => {
-    await syncAvatar();
-});
-
-watch(() => userStore.currentUser?.avatar_id, (newId) => {
-    if (newId) {
-        syncAvatar();
-    }
-});
 
 </script>
 

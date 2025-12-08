@@ -1,4 +1,3 @@
-// Camada de serviço para Avatares
 import { api } from 'src/boot/axios'
 
 const basePath = '/avatares/'

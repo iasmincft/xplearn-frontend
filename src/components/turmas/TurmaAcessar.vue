@@ -18,36 +18,19 @@
         </div>
 
         <div class="row q-pl-xl q-mt-lg">
-            <div class="text-h5 q-mb-md col-12">Alunos Matriculados</div>
+          <div class="col-12 row items-center justify-between q-mb-md">
+            <div class="text-h5">Alunos Matriculados</div>
 
-            <div class="col-12" v-if="alunos && alunos.length > 0">
-                <q-list bordered separator class="rounded-borders bg-grey-9">
-                    <q-item v-for="aluno in alunos" :key="aluno.matricula" class="q-py-md">
+            <q-btn
+              color="primary"
+              icon="person_add"
+              label="Adicionar alunos"
+            />
+          </div>
 
-                        <q-item-section avatar>
-                            <q-avatar>
-                                <img v-if="aluno.avatar" :src="resolveAvatarPath(aluno.avatar.caminho_foto)">
-                                <q-icon v-else name="person" color="grey-5" />
-                            </q-avatar>
-                        </q-item-section>
-
-                        <q-item-section>
-                            <q-item-label class="text-white text-subtitle1">{{ aluno.nome }}</q-item-label>
-                            <q-item-label caption class="text-grey-5">
-                                Nível {{ aluno.nivel || 1 }}
-                            </q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side>
-                            <q-badge color="primary">{{ aluno.xp || 0 }} XP</q-badge>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
-            </div>
-
-            <div v-else class="text-grey q-pa-md">
-                Nenhum aluno matriculado nesta turma.
-            </div>
+          <div class="col-12">
+              <ListaAlunos :alunos="alunosDaTurma" />
+          </div>
         </div>
 
     </q-page>
@@ -59,7 +42,7 @@ import { useRoute } from 'vue-router';
 import { useTurmaStore } from 'src/stores/turmaStore';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
-import { api } from 'src/boot/axios';
+import ListaAlunos from 'src/components/turmas/componentes/ListaAunos.vue';
 
 const route = useRoute();
 const turmaStore = useTurmaStore();
@@ -68,23 +51,13 @@ const turmaId = Number(route.params.id);
 
 const turma = computed(() => turmaStore.getTurmaById(turmaId));
 
-const alunos = computed(() => {
+const alunosDaTurma = computed(() => {
     return turma.value?.alunos || [];
 });
 
 const atividades = computed(() => {
   return atividadesStore.atividadesPorTurma(turmaId);
 });
-
-
-const BASE_URL_AXIOS = api.defaults.baseURL;
-const resolveAvatarPath = (path) => {
-  if (!path) return null;
-  if (path.startsWith('http')) return path;
-  const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${baseUrl}/static${cleanPath}`;
-};
 
 onMounted(async () => {
   if (turmaStore.items.length === 0) {

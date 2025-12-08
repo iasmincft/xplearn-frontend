@@ -33,32 +33,50 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    async syncAvatar() {
+      const avatarId = this.currentUser.avatar?.id || this.currentUser.avatar_id_fk;
+
+      if (avatarId) {
+        const avatarStore = useAvatarStore()
+        if (!avatarStore.items || avatarStore.items.length === 0) {
+          await avatarStore.fetchAvatares();
+        }
+        avatarStore.setAvatar(Number(avatarId))
+      }
+    },
+
     setDados(userData) {
       if (userData) {
-        this.currentUser.nome = userData.nome || this.currentUser.nome
-        this.currentUser.matricula = userData.matricula || this.currentUser.matricula
-        this.currentUser.avatar_id_fk = userData.avatar_id_fk ?? this.currentUser.avatar_id_fk
-        this.currentUser.icone = userData.icone ?? this.currentUser.icone
 
-        if(userData.avatar) {
-          this.currentUser.avatar = userData.avatar
-          this.currentUser.avatar_id_fk = userData.avatar.id
-        } else {
-          this.currentUser.avatar_id_fk = userData.avatar_id_fk ?? this.currentUser.avatar_id_fk
+        this.currentUser.nome = userData.nome || this.currentUser.nome;
+        this.currentUser.matricula = userData.matricula || this.currentUser.matricula;
+        this.currentUser.icone = userData.icone ?? this.currentUser.icone;
+
+        let extractedId = null;
+
+        if (userData.avatar && userData.avatar.id) {
+            this.currentUser.avatar = userData.avatar;
+            extractedId = userData.avatar.id;
+        } else if (userData.avatar_id_fk) {
+            extractedId = userData.avatar_id_fk;
+        }
+
+        if (extractedId) {
+            this.currentUser.avatar_id_fk = extractedId;
         }
 
         if (this.currentUser.matricula) {
-            localStorage.setItem('user_matricula', this.currentUser.matricula)
+            localStorage.setItem('user_matricula', this.currentUser.matricula);
         }
 
         if (this.currentUser.role === 'aluno') {
-          this.currentUser.nickname = userData.nickname || this.currentUser.nickname
-          this.currentUser.xp = userData.xp ?? this.currentUser.xp
-          this.currentUser.nivel = userData.nivel ?? this.currentUser.nivel
+          this.currentUser.nickname = userData.nickname || this.currentUser.nickname;
+          this.currentUser.xp = userData.xp ?? this.currentUser.xp;
+          this.currentUser.nivel = userData.nivel ?? this.currentUser.nivel;
         } else {
-          this.currentUser.nickname = ''
-          this.currentUser.xp = 0
-          this.currentUser.nivel = 1
+          this.currentUser.nickname = '';
+          this.currentUser.xp = 0;
+          this.currentUser.nivel = 1;
         }
       }
     },
@@ -82,13 +100,7 @@ export const useUserStore = defineStore('user', {
         await this.fetchUserProfile(matricula, role)
       }
 
-      if (this.currentUser.avatar_id_fk) {
-        const avatarStore = useAvatarStore()
-        if (avatarStore.items.length === 0) {
-          await avatarStore.fetchAvatares()
-        }
-        avatarStore.setAvatar(this.currentUser.avatar_id_fk)
-      }
+      await this.syncAvatar()
     },
 
     async checkAuth() {
@@ -99,11 +111,7 @@ export const useUserStore = defineStore('user', {
       if (this.currentUser.matricula && this.currentUser.role) {
         try {
           await this.fetchUserProfile(this.currentUser.matricula, this.currentUser.role)
-          if (this.currentUser.avatar_id_fk) {
-            const avatarStore = useAvatarStore()
-            if (avatarStore.items.length === 0) await avatarStore.fetchAvatares()
-            avatarStore.setAvatar(this.currentUser.avatar_id_fk)
-          }
+          await this.syncAvatar()
           return true
         } catch (error) {
           console.error('Sessão inválida ou expirada', error)

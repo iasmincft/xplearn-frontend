@@ -112,12 +112,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from 'stores/userStore'
 import { useAvatarStore } from 'src/stores/avatarStore';
-import { onMounted } from 'vue';
-
 
 import EssentialLink from 'components/EssentialLink.vue'
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
@@ -125,13 +123,13 @@ import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 const userStore = useUserStore();
 const avatarStore = useAvatarStore();
 const router = useRouter();
+const route = useRoute()
 
 const isExpanded = ref(false)
 const isMouseOverMenu = ref(false)
 const userMenu = ref(null);
 
 const headerTitle = 'XP Learn'
-const route = useRoute()
 const pageTitle = computed(() => route.meta.title || 'Página')
 
 const userRole = computed({
@@ -169,6 +167,37 @@ const linksList = [
 
 ]
 
+const carregarAvatarPelaStore = async () => {
+  const user = userStore.dadosDoAluno;
+
+  if (!user) return;
+
+  let avatarId = user.avatar?.id || user.avatar_id_fk;
+
+  if (!avatarId) {
+    return;
+  }
+
+  if (avatarStore.items.length === 0) {
+    try {
+      await avatarStore.fetchAvatares();
+    } catch (e) {
+      console.error("Erro ao carregar avatares:", e);
+      return;
+    }
+  }
+
+  avatarStore.setAvatar(Number(avatarId));
+}
+
+watch(
+  () => userStore.currentUser,
+  () => {
+    carregarAvatarPelaStore();
+  },
+  { deep: true, immediate: true }
+);
+
 const handleLogout = () => {
   userStore.logout(router)
 }
@@ -189,16 +218,6 @@ const handleMenuMouseLeave = () => {
   isExpanded.value = false;
 }
 
-onMounted(async () => {
-
-    if (avatarStore.items.length === 0) {
-        await avatarStore.fetchAvatares();
-    }
-
-    if (userStore.isAluno && userStore.dadosDoAluno?.avatar_id) {
-      avatarStore.setAvatar(userStore.dadosDoAluno?.avatar_id);
-    }
-});
 
 
 

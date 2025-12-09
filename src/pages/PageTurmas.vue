@@ -20,12 +20,23 @@ import { useUserStore } from 'src/stores/userStore';
 import TurmaItem from 'src/components/turmas/TurmaItem.vue';
 import AddTurma from 'src/components/turmas/AddTurma.vue';
 import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const turmaStore = useTurmaStore();
 const userStore = useUserStore();
 const showAddTurma = ref(false);
 
+const route = useRoute();
+const router = useRouter();
+
 onMounted(async () => {
   await turmaStore.fetchTurmas();
+
+  if (route.query.nova === 'true') {
+    showAddTurma.value = true;
+
+    router.replace({ path: '/turmas', query: {} });
+  }
+
 });
 </script>

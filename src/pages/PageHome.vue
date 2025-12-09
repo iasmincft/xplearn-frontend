@@ -44,7 +44,7 @@
                       <q-chip clickable class="bg-dark text-white" style="width: 190px;">
                         <span class="q-pr-lg ">Atividades Pendentes:</span>
                         <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
-                          2
+                          {{atividadesStore.atividadesPendentes.length}}
                         </q-avatar>
                       </q-chip>
                     </q-item>
@@ -57,7 +57,7 @@
                       <q-chip clickable class="bg-dark text-white" style="width: 190px;">
                         <span class="q-pr-lg ">Atividades Concluídas:</span>
                         <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
-                          0
+                          {{atividadesStore.atividadesVencidas.length}}
                         </q-avatar>
                       </q-chip>
                     </q-item>
@@ -88,13 +88,32 @@
 
         <div class="col-12 col-md-5">
 
-          <RankingTurma
-            v-if="userStore.isAluno"
-          />
+          <div v-if="userStore.isAluno">
+            <div class="text-h5 q-pt-xl q-mb-md">Ranking Geral</div>
+            <RankingTurma />
+          </div>
 
-          <Turmas
-            v-if="userStore.isProfessor"
-          />
+          <div v-if="userStore.isProfessor">
+            <div class="text-h5 q-pt-xl q-mb-md">Turmas</div>
+
+            <div v-if="turmaStore.items.length === 0" class="column  q-pa-md">
+              <div class="text-grey-5 q-mb-md">Você ainda não tem turmas.</div>
+              <q-btn
+                color="primary"
+                icon="add"
+                label="Adicionar Turma"
+                :to="{ path: '/turmas', query: { nova: 'true' } }"
+              />
+            </div>
+
+            <div v-else>
+              <Turmas
+                v-for="turma in turmaStore.items"
+                :key="turma.id"
+                :turma="turma"
+              />
+            </div>
+          </div>
 
         </div>
       </div>
@@ -103,20 +122,25 @@
 </template>
 
 <script setup>
+import { useAtividadesStore } from 'src/stores/atividadesStore';
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { useUserStore } from 'src/stores/userStore';
 import { useAvatarStore } from 'src/stores/avatarStore';
+import { useTurmaStore } from 'src/stores/turmaStore';
 
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
-import Turmas from "src/pages/PageTurmas.vue";
+import Turmas from "src/components/turmas/TurmaItem.vue";
 
 const badgeStore = useBadgeStore();
 const userStore = useUserStore();
 const avatarStore = useAvatarStore();
-
+const atividadesStore = useAtividadesStore();
+const turmaStore = useTurmaStore();
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';
+
+
 
 </script>
 

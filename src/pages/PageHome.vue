@@ -89,7 +89,6 @@
         <div class="col-12 col-md-5">
 
           <div v-if="userStore.isAluno">
-            <div class="text-h5 q-pt-xl q-mb-md">Ranking Geral</div>
             <RankingTurma />
           </div>
 

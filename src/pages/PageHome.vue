@@ -96,19 +96,19 @@
           <div v-if="userStore.isProfessor">
             <div class="text-h5 q-pt-xl q-mb-md">Turmas</div>
 
-            <div v-if="turmaStore.items.length === 0" class="column  q-pa-md">
+            <div v-if="turmaStore.minhasTurmas.length === 0" class="column  q-pa-md">
               <div class="text-grey-5 q-mb-md">Você ainda não tem turmas.</div>
               <q-btn
                 color="primary"
                 icon="add"
                 label="Adicionar Turma"
-                :to="{ path: '/turmas', query: { nova: 'true' } }"
+                :to="{ path: '/turmas'}"
               />
             </div>
 
             <div v-else>
               <Turmas
-                v-for="turma in turmaStore.items"
+                v-for="turma in turmaStore.minhasTurmas"
                 :key="turma.id"
                 :turma="turma"
               />

@@ -31,3 +31,28 @@ export async function updateAtividade(payload) {
 export async function deleteAtividade(id) {
   await api.delete(`${basePath}${id}/`)
 }
+
+export async function getAtividadeById(id) {
+  const { data } = await api.get(`${basePath}${id}/`)
+  return data.data || data
+}
+
+export async function getAlunosAtividade(id) {
+  const { data } = await api.get(`${basePath}${id}/alunos`)
+  return data
+}
+
+export async function marcarAlunoFezAtividade(atividadeId, matricula, nota = '0') {
+  const { data } = await api.post(`${basePath}${atividadeId}/alunos/${matricula}`, { nota })
+  return data
+}
+
+export async function desmarcarAlunoFezAtividade(atividadeId, matricula) {
+  const { data } = await api.delete(`${basePath}${atividadeId}/alunos/${matricula}`)
+  return data
+}
+
+export async function atualizarNotaAluno(atividadeId, matricula, nota) {
+  const { data } = await api.put(`${basePath}${atividadeId}/alunos/${matricula}/nota`, { nota: String(nota) })
+  return data
+}

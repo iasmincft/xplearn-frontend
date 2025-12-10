@@ -87,6 +87,14 @@ const routes = [
           title: 'Editar Usuário',
           hideHeaderElement: true
         }
+      },
+      {
+        path: '/atividades/:id',
+        name: 'atividadeDetalhes',
+        component: () => import('src/pages/PageAtividadeDetalhes.vue'),
+        meta: {
+          title: 'Detalhes da Atividade'
+        }
       }
 
     ]

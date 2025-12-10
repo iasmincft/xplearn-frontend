@@ -109,6 +109,7 @@ const alunosDaTurma = computed(() => {
 });
 
 const atividades = computed(() => {
+  if (!turmaId) return []
   return atividadesStore.atividadesPorTurma(turmaId);
 });
 

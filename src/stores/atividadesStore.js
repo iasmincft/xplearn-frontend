@@ -21,7 +21,10 @@ export const useAtividadesStore = defineStore('atividades', {
       const meusTurmaIds = turmaStore.minhasTurmas.map(turma => turma.id)
 
       return state.items.filter(atividade => {
-          return atividade.turma && meusTurmaIds.includes(atividade.turma.id)
+        if (!atividade) return false
+        // Verifica se tem turma (objeto) ou turma_id_fk (número)
+        const turmaId = atividade.turma?.id || atividade.turma_id_fk
+        return turmaId && meusTurmaIds.includes(turmaId)
       })
     },
     // Filtra atividades por data de entrega (pendentes = ainda não entregues)
@@ -42,11 +45,29 @@ export const useAtividadesStore = defineStore('atividades', {
     },
     // Filtra por turma
     atividadesPorTurma: (state) => {
-      return (turmaId) => state.items.filter(a => a.turma.id === turmaId)
+      return (turmaId) => {
+        if (!turmaId) return []
+        // Converte turmaId para número para comparação consistente
+        const turmaIdNum = Number(turmaId)
+        return state.items.filter(a => {
+          if (!a) return false
+          // O backend retorna turma_id_fk como número
+          // Mas pode ter turma como objeto em alguns casos (quando carregado com relacionamento)
+          const atividadeTurmaId = a.turma?.id || a.turma_id_fk
+          // Compara convertendo ambos para número
+          return Number(atividadeTurmaId) === turmaIdNum
+        })
+      }
     },
     // Filtra por badge
     atividadesPorBadge: (state) => {
-      return (badgeId) => state.items.filter(a => a.badge.id === badgeId)
+      return (badgeId) => state.items.filter(a => {
+        if (!a) return false
+        // O backend retorna badge_id_fk como número
+        // Mas pode ter badge como objeto em alguns casos (quando carregado com relacionamento)
+        const atividadeBadgeId = a.badge?.id || a.badge_id_fk
+        return atividadeBadgeId === badgeId
+      })
     }
   },
   actions: {

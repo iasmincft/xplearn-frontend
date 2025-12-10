@@ -97,8 +97,8 @@ const getBadgeName = (index) => {
 onMounted(async () => {
     const promises = [badgeStore.fetchBadges()];
 
-    if (userStore.isAluno && userStore.currentUser?.id) {
-        promises.push(badgeStore.fetchUserBadges(userStore.currentUser.id));
+    if (userStore.isAluno && userStore.currentUser?.matricula) {
+        promises.push(badgeStore.fetchUserBadges(userStore.currentUser.matricula));
     }
 
     await Promise.all(promises);

@@ -9,59 +9,35 @@
 
       <q-item-section>
         <q-item-label>{{ atividade.nome }}</q-item-label>
-        <q-item-label class="q-pl-md">{{ atividade.turma.nome }}</q-item-label>
+
+        <q-item-label v-if="!hideTurma && atividade.turma" class="q-pl-md">
+          {{ atividade.turma.nome }}
+        </q-item-label>
+
         <q-item-label caption class="text-grey-5">Entrega: {{ formatarData(atividade.data_entrega) }}</q-item-label>
       </q-item-section>
 
       <q-item-section avatar>
-        <q-btn
-          v-if="userStore.isProfessor"
-          :class="{ 'bg-dark': menuAberto }"
-          icon="more_horiz"
-          class="text-h5"
-          flat
-          dense
-          size="md"
-        >
-          <q-menu
-            v-model="menuAberto"
-            anchor="bottom right"
-            self="bottom left"
-            class="bg-dark"
-            auto-close
-          >
+        <q-btn v-if="userStore.isProfessor" :class="{ 'bg-dark': menuAberto }" icon="more_horiz" class="text-h5" flat
+          dense size="md">
+          <q-menu v-model="menuAberto" anchor="bottom right" self="bottom left" class="bg-dark" auto-close>
             <q-list style="min-width: 150px">
 
-              <q-item
-                clickable
-                v-close-popup
-                @click="$emit('view-atividade', atividade)"
-                class="text-white"
-              >
+              <q-item clickable v-close-popup @click="$emit('view-atividade', atividade)" class="text-white">
                 <q-item-section avatar>
                   <q-icon name="visibility" />
                 </q-item-section>
                 <q-item-section>Visualizar</q-item-section>
               </q-item>
 
-              <q-item
-                clickable
-                v-close-popup
-                @click="$emit('editar-atividade', atividade)"
-                class="text-white"
-              >
+              <q-item clickable v-close-popup @click="$emit('editar-atividade', atividade)" class="text-white">
                 <q-item-section avatar>
                   <q-icon name="edit" />
                 </q-item-section>
                 <q-item-section>Editar</q-item-section>
               </q-item>
 
-              <q-item
-                clickable
-                v-close-popup
-                @click="$emit('deletar-atividade', atividade)"
-                class="text-white"
-              >
+              <q-item clickable v-close-popup @click="$emit('deletar-atividade', atividade)" class="text-white">
                 <q-item-section avatar>
                   <q-icon name="delete" />
                 </q-item-section>
@@ -72,8 +48,6 @@
           </q-menu>
         </q-btn>
       </q-item-section>
-
-
 
     </template>
 
@@ -101,13 +75,8 @@
 
           <div class="col-auto">
             <div class="text-caption text-grey-5">Badge:</div>
-            <div v-if="atividade.badge" >
-              <q-img
-                :src="getBadgeSrc(atividade.badge)"
-                width="40px"
-                height="40px"
-                style="border-radius: 4px;"
-              >
+            <div v-if="atividade.badge">
+              <q-img :src="getBadgeSrc(atividade.badge)" width="40px" height="40px" style="border-radius: 4px;">
                 <q-tooltip>{{ atividade.badge.nome }}</q-tooltip>
               </q-img>
             </div>
@@ -128,13 +97,18 @@ import { api } from 'src/boot/axios';
 
 const userStore = useUserStore();
 
-
+// ALTERAÇÃO 2: Adicionada a prop hideTurma
 defineProps({
   atividade: {
     type: Object,
     required: true
+  },
+  hideTurma: {
+    type: Boolean,
+    default: false
   }
 })
+
 const menuAberto = ref(false);
 defineEmits(['editar-atividade', 'deletar-atividade'])
 

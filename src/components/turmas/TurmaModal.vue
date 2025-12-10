@@ -1,5 +1,5 @@
 <template>
-    <q-card>
+    <q-card style="width: 500px;">
         <ModalHeader @close="closeModal">{{ isEditing ? 'Editar Turma' : 'Nova Turma' }}</ModalHeader>
 
         <q-card-section class="q-pa-md">

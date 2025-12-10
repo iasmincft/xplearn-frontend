@@ -18,16 +18,8 @@
         </q-item-section>
 
         <q-item-section side>
-          <q-btn
-            icon="close"
-            flat
-            round
-            dense
-            color="negative"
-            class=" q-ma-sm"
-            v-close-popup
-          >
-          <q-tooltip>Remover aluno</q-tooltip>
+          <q-btn icon="close" flat round dense color="negative" class=" q-ma-sm" v-close-popup>
+            <q-tooltip>Remover aluno</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>

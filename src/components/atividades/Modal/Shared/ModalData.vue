@@ -11,7 +11,7 @@
                         :model-value="data" 
                         @update:model-value="$emit('update:data', $event)"
                         mask="DD/MM/YYYY" 
-                        color="secondary" 
+                        color="primary" 
                         >
                         <div class="row items-center justify-end">
                             <q-btn 

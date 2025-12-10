@@ -8,10 +8,11 @@
             dense
             color="primary"
             icon="close" 
+            @click="$emit('close')"
         />
     </q-card-section>
 </template>
 
 <script setup>
-
+defineEmits(['close']);
 </script>

@@ -8,6 +8,7 @@
       v-for="atividade in atividades"
       :key="atividade.id"
       :atividade="atividade"
+      :hide-turma="hideTurma"
       @editar-atividade="$emit('editar-atividade', $event)"
       @deletar-atividade="$emit('deletar-atividade', $event)"
     />
@@ -21,6 +22,10 @@ defineProps({
   atividades: {
     type: Array,
     required: true
+  },
+  hideTurma: {
+    type: Boolean,
+    default: false
   }
 })
 

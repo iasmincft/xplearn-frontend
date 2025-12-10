@@ -18,10 +18,6 @@
                     </div>
                 </div>
 
-                <div v-if="!hideTurma">
-                    <ModalTurmaSelect v-model:turmaId="localAtividade.turma_id_fk" />
-                </div>
-
                 <ModalBadgeSelect v-model:badgeId="localAtividade.badge_id_fk" />
 
                 <ModalData v-model:data="localAtividade.data_entrega" @open-date-picker="setDefaultDate" />
@@ -42,19 +38,19 @@ import ModalData from './Shared/ModalData.vue';
 import ModalDescricao from './Shared/ModalDescricao.vue';
 import ModalNotaMax from './Shared/ModalNotaMax.vue';
 import ModalPontos from './Shared/ModalPontos.vue';
-import ModalTurmaSelect from './Shared/ModalTurmaSelect.vue';
 import ModalBadgeSelect from './Shared/ModalBadgeSelect.vue';
 import ModalButtons from './Shared/ModalButtons.vue';
 
 const props = defineProps({
-  atividade: {
-    type: Object,
-    required: true
-  },
-  hideTurma: {
-    type: Boolean,
-    default: false
-  }
+    atividade: {
+        type: Object,
+        required: true,
+        default: null
+    },
+    hideTurma: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const emit = defineEmits(['close', 'save-atividade']);
@@ -62,14 +58,14 @@ const emit = defineEmits(['close', 'save-atividade']);
 const $q = useQuasar();
 const formRef = ref(null);
 const localAtividade = reactive({
-  id: null,
-  nome: '',
-  descricao: null,
-  nota_max: null,
-  pontos: null,
-  turma_id_fk: null,
-  badge_id_fk: null,
-  data_entrega: '',
+    id: null,
+    nome: '',
+    descricao: null,
+    nota_max: null,
+    pontos: null,
+    turma_id_fk: null,
+    badge_id_fk: null,
+    data_entrega: '',
 });
 
 const isDirty = ref(false);
@@ -220,7 +216,7 @@ const closeModal = () => {
             persistent: true,
         }).onOk(() => {
             emit('close');
-        }).onCancel(() => {});
+        }).onCancel(() => { });
     } else {
         emit('close');
     }

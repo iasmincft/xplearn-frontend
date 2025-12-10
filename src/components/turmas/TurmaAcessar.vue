@@ -14,14 +14,16 @@
                   color="primary"
                   icon="add_task"
                   label="Adicionar atividade"
-                  @click="console.log('Botão adicionar clicado')"
+                  @click="showAdicionarAtividade = true"
                 />
             </div>
 
             <div v-if="atividades && atividades.length > 0" class="col-12">
                 <AtividadeLista
                     :atividades="atividades"
+                    :hide-turma="true"
                     @editar-atividade="abrirModalEdicao"
+                    @deletar-atividade="confirmarExclusao"
                 />
             </div>
 
@@ -38,6 +40,7 @@
               color="primary"
               icon="person_add"
               label="Adicionar alunos"
+              @click="showAdicionarAluno = true" 
             />
           </div>
 
@@ -46,11 +49,26 @@
           </div>
         </div>
 
+        <q-dialog v-model="showAdicionarAtividade">
+            <AddAtividade 
+                :turma-id="turmaId"
+                @close="showAdicionarAtividade = false"
+            />
+        </q-dialog>
         <q-dialog v-model="showEditarAtividade">
             <EditarAtividade
                 ref="editarAtividadeRef"
                 :hide-turma="true"
                 @close="showEditarAtividade = false"
+            />
+        </q-dialog>
+
+        <q-dialog v-model="showAdicionarAluno">
+            <AddAlunoTurma
+                :turma-id="turmaId"
+                :alunos-atuais="alunosDaTurma"
+                @close="showAdicionarAluno = false"
+                @alunos-adicionados="atualizarTurma"
             />
         </q-dialog>
 
@@ -62,17 +80,25 @@ import { computed, onMounted, ref, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTurmaStore } from 'src/stores/turmaStore';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
-
+import { useQuasar } from 'quasar';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import ListaAlunos from 'src/components/turmas/componentes/ListaAunos.vue';
+import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
+import AddAlunoTurma from 'src/components/turmas/modal/AddAlunoTurma.vue';
+
 
 const route = useRoute();
 const turmaStore = useTurmaStore();
 const atividadesStore = useAtividadesStore();
 const turmaId = Number(route.params.id);
+const $q = useQuasar();
 
+// Estados dos Modais
+const showAdicionarAtividade = ref(false);
 const showEditarAtividade = ref(false);
+const showAdicionarAluno = ref(false); // Novo estado
+
 const editarAtividadeRef = ref(null);
 
 const turma = computed(() => turmaStore.getTurmaById(turmaId));
@@ -85,17 +111,47 @@ const atividades = computed(() => {
   return atividadesStore.atividadesPorTurma(turmaId);
 });
 
+// Função chamada quando o modal de alunos salva com sucesso
+async function atualizarTurma() {
+    // Recarrega as turmas para atualizar a lista de alunos vinculados
+    // Se a sua API tiver um endpoint específico para "getTurma(id)", seria melhor usar ele.
+    // Como o store parece carregar tudo, vamos forçar um fetch:
+    await turmaStore.fetchTurmas(); 
+}
+
 function abrirModalEdicao(atividade) {
-  console.log('Recebido pedido de edição para:', atividade);
-
   showEditarAtividade.value = true;
-
   nextTick(() => {
     if (editarAtividadeRef.value) {
-      console.log('Modal encontrado, abrindo formulário...');
       editarAtividadeRef.value.open(atividade);
-    } else {
-      console.error('ERRO: Modal de edição não foi encontrado. Verifique o ref="editarAtividadeRef"');
+    }
+  });
+}
+
+function confirmarExclusao(atividade) {
+  $q.dialog({
+    title: 'Excluir Atividade',
+    message: `Tem certeza que deseja excluir a atividade "${atividade.nome}"?`,
+    cancel: true,
+    persistent: true,
+    ok: {
+        label: 'Excluir',
+        color: 'negative'
+    }
+  }).onOk(async () => {
+    try {
+        await atividadesStore.deleteAtividade(atividade.id); 
+        $q.notify({
+            message: 'Atividade excluída com sucesso',
+            color: 'positive',
+            icon: 'delete'
+        });
+    } catch (error) {
+        $q.notify({
+            message: 'Erro ao excluir: ' + (error.message || 'Erro desconhecido'),
+            color: 'negative',
+            icon: 'warning'
+        });
     }
   });
 }

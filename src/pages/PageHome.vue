@@ -32,7 +32,7 @@
 
         <div class="col-12 col-md-7">
 
-          <div style="width: fit-content;">
+          <div v-if="userStore.isAluno" style="width: fit-content;">
             <div class="text-h5 q-pt-xl q-mb-md">Atividades</div>
               <q-card rounded class="bg-dark-page q-pa-sm" style="width: fit-content;" flat >
                 <q-list>
@@ -65,6 +65,27 @@
                 </q-list>
               </q-card>
             </div>
+            <div v-if="userStore.isProfessor">
+            <div class="text-h5 q-pt-xl q-mb-md">Turmas</div>
+
+            <div v-if="turmaStore.minhasTurmas.length === 0" class="column  q-pa-md">
+              <div class="text-grey-5 q-mb-md">Você ainda não tem turmas.</div>
+              <q-btn
+                color="primary"
+                icon="add"
+                label="Adicionar Turma"
+                :to="{ path: '/turmas'}"
+              />
+            </div>
+
+            <div v-else>
+              <Turmas
+                v-for="turma in turmaStore.minhasTurmas"
+                :key="turma.id"
+                :turma="turma"
+              />
+            </div>
+          </div>
           <div style="width: fit-content;" v-if="userStore.isAluno">
             <div class="text-h5 q-mb-md q-pt-xl">Badges</div>
             <div class="row q-gutter-md">
@@ -91,29 +112,6 @@
           <div v-if="userStore.isAluno">
             <RankingTurma />
           </div>
-
-          <div v-if="userStore.isProfessor">
-            <div class="text-h5 q-pt-xl q-mb-md">Turmas</div>
-
-            <div v-if="turmaStore.minhasTurmas.length === 0" class="column  q-pa-md">
-              <div class="text-grey-5 q-mb-md">Você ainda não tem turmas.</div>
-              <q-btn
-                color="primary"
-                icon="add"
-                label="Adicionar Turma"
-                :to="{ path: '/turmas'}"
-              />
-            </div>
-
-            <div v-else>
-              <Turmas
-                v-for="turma in turmaStore.minhasTurmas"
-                :key="turma.id"
-                :turma="turma"
-              />
-            </div>
-          </div>
-
         </div>
       </div>
     </div>

@@ -88,7 +88,7 @@ import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import ListaAlunos from 'src/components/turmas/componentes/ListaAunos.vue';
 import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
-import AddAlunoTurma from 'src/components/turmas/Modal/AddAlunoTurma.vue'; // Verifique se a pasta é "Modal" ou "modal"
+import AddAlunoTurma from 'src/components/turmas/modal/AddAlunoTurma.vue'; 
 
 const route = useRoute();
 const turmaStore = useTurmaStore();

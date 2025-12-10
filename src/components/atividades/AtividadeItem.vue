@@ -9,6 +9,7 @@
 
       <q-item-section>
         <q-item-label>{{ atividade.nome }}</q-item-label>
+        <q-item-label class="q-pl-md">{{ atividade.turma.nome }}</q-item-label>
         <q-item-label caption class="text-grey-5">Entrega: {{ formatarData(atividade.data_entrega) }}</q-item-label>
       </q-item-section>
 

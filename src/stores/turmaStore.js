@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { listTurmas, createTurma, updateTurma, deleteTurma } from 'src/services/turmasService'
+import { useUserStore } from 'src/stores/userStore'
 
 export const useTurmaStore = defineStore('turma', {
     state: () => ({
@@ -10,6 +11,29 @@ export const useTurmaStore = defineStore('turma', {
     getters: {
         getTurmaById: (state) => {
             return (id) => state.items.find(item => item.id === id)
+        },
+
+        minhasTurmas: (state) => {
+            const userStore = useUserStore()
+            const user = userStore.currentUser
+
+            if (!user || !user.id) return []
+
+            return state.items.filter(turma => {
+
+                if (userStore.isProfessor) {
+                    return turma.professor && user.nome && turma.professor=== user.nome
+                }
+
+                if (userStore.isAluno) {
+                    if (turma.alunos && Array.isArray(turma.alunos)) {
+                        return turma.alunos.some(aluno => aluno.id === user.id)
+                    }
+                    return false
+                }
+
+                return false
+            })
         }
     },
     actions: {
@@ -21,7 +45,6 @@ export const useTurmaStore = defineStore('turma', {
             } catch (err) {
                 this.error = 'Falha ao buscar turmas da API.'
                 console.error('Erro ao buscar turmas:', err)
-                // Fallback para localStorage se API falhar
                 const localData = JSON.parse(localStorage.getItem('turma'))
                 if (localData) {
                     this.items = localData

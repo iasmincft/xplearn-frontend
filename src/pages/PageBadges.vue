@@ -1,25 +1,30 @@
 <template>
   <q-page class="q-pa-lg column no-wrap">
     <div class="q-pl-xl">
-      <div class="text-h5">Minhas Conquistas</div>
-      <div v-if="userBadges.length === 0" class="q-pt-md text-grey">
-        Nenhum badge conquistado ainda.
-      </div>
-      <div v-else class="row q-pt-md q-gutter-sm">
-        <div
-          v-for="badge in userBadges"
-          :key="`user-badge-${badge.id}`"
-        >
-          <q-img
-            :src="getBadgeImage(badge)"
-            width="100px"
-            height="100px"
-            style="border-radius: 8px;"
+
+      <div v-if="!userStore.isProfessor">
+        <div class="text-h5">Minhas Conquistas</div>
+
+        <div v-if="badgeStore.userItems.length === 0" class="q-pt-md text-grey">
+          Nenhum badge conquistado ainda.
+        </div>
+
+        <div v-else class="row q-pt-md q-gutter-sm">
+          <div
+            v-for="badge in badgeStore.userItems"
+            :key="`user-badge-${badge.id}`"
           >
-            <q-tooltip>
-              {{ badge.nome }}
-            </q-tooltip>
-          </q-img>
+            <q-img
+              :src="getBadgeImage(badge)"
+              width="100px"
+              height="100px"
+              style="border-radius: 8px;"
+            >
+              <q-tooltip>
+                {{ badge.nome }}
+              </q-tooltip>
+            </q-img>
+          </div>
         </div>
       </div>
 
@@ -46,23 +51,32 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { api } from 'src/boot/axios';
-
+import { useUserStore } from 'src/stores/userStore';
 
 const badgeStore = useBadgeStore();
-const userBadges = ref([]);
+
+const userStore = useUserStore();
+
 const emptySlot = '/emptyBadgeSlot.png'
-const maxSlots= computed(() => {
+const maxSlots = computed(() => {
   return badgeStore.items ? badgeStore.items.length : 0;
 });
 
 const BASE_URL_AXIOS = api.defaults.baseURL;
 
 
-const getBadgeImage = (index) => {
-  const item = badgeStore.items && badgeStore.items[index];
+const getBadgeImage = (indexOrItem) => {
+  let item;
+
+  if (typeof indexOrItem === 'object') {
+    item = indexOrItem;
+  } else {
+    item = badgeStore.items && badgeStore.items[indexOrItem];
+  }
+
   const pathDoBanco = item ? item.caminho_foto : null;
 
   if (!item || !pathDoBanco) {
@@ -71,9 +85,8 @@ const getBadgeImage = (index) => {
 
   const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
   const path = pathDoBanco.startsWith('/') ? pathDoBanco : `/${pathDoBanco}`;
-  const fullUrl = `${baseUrl}/static${path}`;
 
-  return fullUrl
+  return `${baseUrl}/static${path}`;
 };
 
 const getBadgeName = (index) => {
@@ -82,6 +95,12 @@ const getBadgeName = (index) => {
 };
 
 onMounted(async () => {
-    await badgeStore.fetchBadges();
+    const promises = [badgeStore.fetchBadges()];
+
+    if (userStore.isAluno && userStore.currentUser?.id) {
+        promises.push(badgeStore.fetchUserBadges(userStore.currentUser.id));
+    }
+
+    await Promise.all(promises);
 });
 </script>

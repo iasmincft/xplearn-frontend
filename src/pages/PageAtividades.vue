@@ -9,9 +9,9 @@
       <q-tab-panels v-model="tabAtividades" animated class="bg-transparent absolute-full">
         <q-tab-panel name="pendentes" class="q-pa-none">
           <q-scroll-area class="fit q-pa-md">
-            <AtividadeLista 
+            <AtividadeLista
               v-if="atividadesStore.atividadesPendentes && atividadesStore.atividadesPendentes.length > 0"
-              :atividades="atividadesStore.atividadesPendentes" 
+              :atividades="atividadesStore.atividadesPendentes"
               @editar-atividade="abrirModalEdicao"
               @deletar-atividade="promptToDelete"
             />
@@ -23,9 +23,9 @@
 
         <q-tab-panel name="concluidas" class="q-pa-none">
           <q-scroll-area class="fit q-pa-md">
-            <AtividadeLista 
+            <AtividadeLista
               v-if="atividadesStore.atividadesVencidas && atividadesStore.atividadesVencidas.length > 0"
-              :atividades="atividadesStore.atividadesVencidas" 
+              :atividades="atividadesStore.atividadesVencidas"
               @editar-atividade="abrirModalEdicao"
               @deletar-atividade="promptToDelete"
             />
@@ -38,9 +38,9 @@
     </div>
 
     <q-page-sticky position="bottom-right" :offset="[50, 50]" v-if="userStore.isProfessor">
-      <q-btn 
-        fab 
-        icon="add" 
+      <q-btn
+        fab
+        icon="add"
         color="accent"
         @click="showAddAtividade = true"
         />
@@ -61,6 +61,7 @@ import { useQuasar } from 'quasar';
 import { onMounted, ref, nextTick } from 'vue';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
 import { useUserStore } from 'src/stores/userStore';
+import { useTurmaStore } from 'src/stores/turmaStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
@@ -69,19 +70,23 @@ import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue
 const userStore = useUserStore();
 const tabAtividades = ref('pendentes');
 const atividadesStore = useAtividadesStore();
+const turmaStore = useTurmaStore();
 const $q = useQuasar();
 const showAddAtividade = ref(false);
 const showEditarAtividade = ref(false);
 const editarAtividadeRef = ref(null);
 
-onMounted(() => {
-  atividadesStore.fetchAtividades(); // Carrega os dados da API
+onMounted(async() => {
+  await Promise.all([
+    atividadesStore.fetchAtividades(),
+    turmaStore.fetchTurmas()
+  ]);
 });
 
 const promptToDelete = (atividade) => {
   // Extrai o ID se for um objeto ou usa diretamente se for um número
   const id = atividade?.id || atividade
-  
+
   $q.dialog({
     title: 'Confirme para deletar',
     message: `Tem certeza que deseja deletar a atividade "${atividade?.nome || 'esta atividade'}"?`,
@@ -98,7 +103,7 @@ const promptToDelete = (atividade) => {
     persistent: true
   }).onOk(async () => {
     try {
-        await atividadesStore.deleteAtividade(id); 
+        await atividadesStore.deleteAtividade(id);
         $q.notify({
             message: 'Atividade deletada com sucesso!',
             color: 'positive',

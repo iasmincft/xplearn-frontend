@@ -5,6 +5,7 @@ import {
   updateAtividade as updateAtividadeService,
   deleteAtividade as deleteAtividadeService,
 } from 'src/services/atividadesService'
+import { useTurmaStore } from './turmaStore'
 
 export const useAtividadesStore = defineStore('atividades', {
   state: () => ({
@@ -13,18 +14,28 @@ export const useAtividadesStore = defineStore('atividades', {
     error: null,
   }),
   getters: {
-    // Filtra atividades por data de entrega (pendentes = ainda não entregues)
-    atividadesPendentes: (state) => {
-      const agora = new Date()
+    // Filtra atividades que pertencem às turmas do usuário
+    minhasAtividades: (state) => {
+      const turmaStore = useTurmaStore()
+
+      const meusTurmaIds = turmaStore.minhasTurmas.map(turma => turma.id)
+
       return state.items.filter(atividade => {
+          return atividade.turma && meusTurmaIds.includes(atividade.turma.id)
+      })
+    },
+    // Filtra atividades por data de entrega (pendentes = ainda não entregues)
+    atividadesPendentes() {
+      const agora = new Date()
+      return this.minhasAtividades.filter(atividade => {
         const dataEntrega = new Date(atividade.data_entrega)
         return dataEntrega > agora
       })
     },
     // Atividades com data de entrega já passada
-    atividadesVencidas: (state) => {
+    atividadesVencidas() {
       const agora = new Date()
-      return state.items.filter(atividade => {
+      return this.minhasAtividades.filter(atividade => {
         const dataEntrega = new Date(atividade.data_entrega)
         return dataEntrega <= agora
       })

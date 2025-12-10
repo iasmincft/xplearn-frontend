@@ -1,4 +1,3 @@
-// Camada de serviço para Badges
 import { api } from 'src/boot/axios'
 
 const basePath = '/badges/'
@@ -9,3 +8,7 @@ export async function listBadges() {
   return data.data || data
 }
 
+export const listBadgesDoAluno = async (alunoId) => {
+    const { data } = await api.get(`/alunos/${alunoId}/badges`)
+    return data
+}

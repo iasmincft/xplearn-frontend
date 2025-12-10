@@ -95,10 +95,10 @@
               >
                 <q-avatar size="90px">
                   <q-img
-                    :src="badgeStore.items[index - 1] ? badgeStore.items[index - 1].badge : emptySlotImage"
+                    :src="getBadgeImage(index - 1)"
                   >
                     <q-tooltip>
-                      {{ badgeStore.items[index - 1] ? badgeStore.items[index - 1].nome : 'Slot Vazio' }}
+                      {{ getBadgeName(index - 1) }}
                     </q-tooltip>
                   </q-img>
                 </q-avatar>
@@ -119,11 +119,13 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
 import { useBadgeStore } from 'src/stores/badgeStore';
 import { useUserStore } from 'src/stores/userStore';
 import { useAvatarStore } from 'src/stores/avatarStore';
 import { useTurmaStore } from 'src/stores/turmaStore';
+import { api } from 'src/boot/axios';
 
 import SecaoNivelXP from 'src/components/nivelXP/SecaoNivelXP.vue';
 import RankingTurma from 'src/pages/PageRanking.vue'
@@ -137,7 +139,41 @@ const turmaStore = useTurmaStore();
 const slotsVisiveis = 5;
 const emptySlotImage = '/emptyBadgeSlot.png';
 
+const BASE_URL_AXIOS = api.defaults.baseURL;
 
+const getBadgeImage = (index) => {
+  const badge = badgeStore.userItems && badgeStore.userItems[index];
+  
+  if (!badge || !badge.caminho_foto) {
+    return emptySlotImage;
+  }
+  
+  const pathDoBanco = badge.caminho_foto;
+  
+  if (pathDoBanco.startsWith('http')) {
+    return pathDoBanco;
+  }
+  
+  const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
+  const path = pathDoBanco.startsWith('/') ? pathDoBanco : `/${pathDoBanco}`;
+  
+  return `${baseUrl}/static${path}`;
+};
+
+const getBadgeName = (index) => {
+  const badge = badgeStore.userItems && badgeStore.userItems[index];
+  return badge ? badge.nome : 'Slot Vazio';
+};
+
+onMounted(async () => {
+  const promises = [];
+  
+  if (userStore.isAluno && userStore.currentUser?.matricula) {
+    promises.push(badgeStore.fetchUserBadges(userStore.currentUser.matricula));
+  }
+  
+  await Promise.all(promises);
+});
 
 </script>
 

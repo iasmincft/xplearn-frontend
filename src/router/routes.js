@@ -54,7 +54,7 @@ const routes = [
         path: '/settings',
         component: () => import('src/pages/PageSettings.vue'),
         meta: {
-          title: 'Settings',
+          title: 'Configurações',
           hideHeaderElement: true
         }
       },

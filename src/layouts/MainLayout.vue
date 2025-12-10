@@ -65,7 +65,7 @@
                       <q-item-section avatar>
                         <q-icon name="delete" />
                       </q-item-section>
-                      <q-item-section>LogOut</q-item-section>
+                      <q-item-section>Sair</q-item-section>
                     </q-item>
 
                   </q-list>
@@ -83,22 +83,6 @@
       <div class="text-h4 text-bold q-pa-md q-ml-lg" v-if="!route.meta.hideHeaderAuth">
         <div class="row">
           {{ pageTitle }}
-          <q-space />
-          <div>
-            <q-btn-toggle
-              v-model="userRole"
-              class="my-custom-toggle"
-              no-caps
-              rounded
-              unelevated
-              toggle-color="primary"
-              color="white"
-              text-color="primary"
-              :options="[
-                { label: 'Aluno', value: 'aluno' },
-                { label: 'Professor', value: 'professor' }]"
-            />
-          </div>
           <q-space />
           <div class="col-xs-12 col-sm-5 q-pa-sm">
             <SecaoNivelXP v-if="!route.meta.hideHeaderElement && userStore.isAluno" />
@@ -131,11 +115,6 @@ const userMenu = ref(null);
 
 const headerTitle = 'XP Learn'
 const pageTitle = computed(() => route.meta.title || 'Página')
-
-const userRole = computed({
-  get: () => userStore.currentUser.role,
-  set: (newRole) => userStore.setRole(newRole)
-})
 
 
 const linksList = computed(() => {

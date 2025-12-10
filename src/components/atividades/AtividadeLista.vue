@@ -1,18 +1,9 @@
 <template>
-  <transition-group
-    appear
-    leave-active-class="animated zoomOut"
-    tag="div"
-  >
-    <AtividadeItem
-      v-for="atividade in atividades"
-      :key="atividade.id"
-      :atividade="atividade"
-      :hide-turma="hideTurma"
-      @editar-atividade="$emit('editar-atividade', $event)"
-      @deletar-atividade="$emit('deletar-atividade', $event)"
-    />
-  </transition-group>
+  <div>
+    <AtividadeItem v-for="atividade in atividades" :key="atividade.id" :atividade="atividade" :hide-turma="hideTurma"
+      @view-atividade="handleViewAtividade" @editar-atividade="$emit('editar-atividade', $event)"
+      @deletar-atividade="$emit('deletar-atividade', $event)" />
+  </div>
 </template>
 
 <script setup>
@@ -29,5 +20,9 @@ defineProps({
   }
 })
 
-defineEmits(['editar-atividade', 'deletar-atividade'])
+const emit = defineEmits(['view-atividade', 'editar-atividade', 'deletar-atividade'])
+
+function handleViewAtividade(event) {
+  emit('view-atividade', event)
+}
 </script>

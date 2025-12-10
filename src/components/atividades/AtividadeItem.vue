@@ -23,7 +23,7 @@
           <q-menu v-model="menuAberto" anchor="bottom right" self="bottom left" class="bg-dark" auto-close>
             <q-list style="min-width: 150px">
 
-              <q-item clickable v-close-popup @click="$emit('view-atividade', atividade)" class="text-white">
+              <q-item clickable @click="handleViewAtividade" class="text-white">
                 <q-item-section avatar>
                   <q-icon name="visibility" />
                 </q-item-section>
@@ -92,13 +92,15 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useUserStore } from 'src/stores/userStore';
 import { api } from 'src/boot/axios';
 
+const router = useRouter();
 const userStore = useUserStore();
 
 // ALTERAÇÃO 2: Adicionada a prop hideTurma
-defineProps({
+const props = defineProps({
   atividade: {
     type: Object,
     required: true
@@ -110,7 +112,19 @@ defineProps({
 })
 
 const menuAberto = ref(false);
-defineEmits(['editar-atividade', 'deletar-atividade'])
+const emit = defineEmits(['view-atividade', 'editar-atividade', 'deletar-atividade'])
+
+function handleViewAtividade() {
+  const atividadeId = props.atividade?.id || props.atividade;
+  if (atividadeId) {
+    menuAberto.value = false // Fecha o menu manualmente
+    router.push({ name: 'atividadeDetalhes', params: { id: atividadeId } }).catch(err => {
+      console.error('Erro ao navegar:', err);
+    });
+  }
+  // Também emite o evento para compatibilidade
+  emit('view-atividade', props.atividade)
+}
 
 const BASE_URL_AXIOS = api.defaults.baseURL;
 

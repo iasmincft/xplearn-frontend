@@ -138,34 +138,44 @@ const userRole = computed({
 })
 
 
-const linksList = [
-  {
-    title: 'Home',
-    icon: 'home',
-    link: '/home'
-  },
-  {
-    title: 'Atividades',
-    icon: 'list',
-    link: '/atividades',
-  },
-  {
-    title: 'Ranking',
-    icon: 'leaderboard',
-    link: '/ranking',
-  },
-  {
-    title: 'Turmas',
-    icon: 'groups',
-    link: '/turmas',
-  },
-  {
-    title: 'Badges',
-    icon: 'military_tech',
-    link: '/badges',
-  },
+const linksList = computed(() => {
+  const links = [
+    {
+      title: 'Home',
+      icon: 'home',
+      link: '/home'
+    }
+  ]
 
-]
+  if (userStore.currentUser?.role !== 'professor') {
+    links.push({
+      title: 'Atividades',
+      icon: 'list',
+      link: '/atividades',
+    })
+  }
+
+  links.push(
+    {
+      title: 'Ranking',
+      icon: 'leaderboard',
+      link: '/ranking',
+    },
+    {
+      title: 'Turmas',
+      icon: 'groups',
+      link: '/turmas',
+      active: route.path.startsWith('/turmas')
+    },
+    {
+      title: 'Badges',
+      icon: 'military_tech',
+      link: '/badges',
+    }
+  )
+
+  return links
+})
 
 const handleLogout = () => {
   userStore.logout(router)

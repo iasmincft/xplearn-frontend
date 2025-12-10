@@ -5,9 +5,7 @@
         <q-card-section class="q-pa-md">
             <q-form @submit.prevent="saveTurma" class="q-gutter-md" ref="formRef">
 
-                <ModalNome v-model:nome="localTurma.name" />
-
-                <ModalProf v-model:professor="localTurma.professor"/>
+                <ModalNome v-model:nome="localTurma.nome" />
 
                 <ModalButtons :is-dirty="isDirty" />
 
@@ -21,53 +19,43 @@ import { reactive, watch, ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import ModalHeader from './Shared/ModalHeader.vue';
 import ModalNome from './Shared/ModalNome.vue';
-import ModalProf from './Shared/ModalProf.vue';
 import ModalButtons from './Shared/ModalButtons.vue';
 
 const props = defineProps({
-    atividade: {
+    turma: {
         type: Object,
         default: null,
     },
 });
 
-const emit = defineEmits(['close', 'salvar']);
-
+const emit = defineEmits(['close', 'save-turma']);
 const $q = useQuasar();
 const formRef = ref(null);
 const localTurma = reactive({
-    name: '',
-    professor: '',
-    descricao: '',
-    completed: false,
+    nome: ''
 });
 
 const isDirty = ref(false);
 
-const isEditing = computed(() => !!props.atividade);
+const isEditing = computed(() => !!props.turma);
 
-watch(() => props.atividade, (newVal) => {
+watch(() => props.turma, (newVal) => {
     if (newVal) {
-        Object.assign(localTurma, newVal);
+        localTurma.nome = newVal.nome || newVal.name || '';
         isDirty.value = false;
     } else {
-        // Reset para uma nova tarefa
         Object.assign(localTurma, {
-            name: '',
-            professor: '',
-            descricao: '',
-            completed: false,
+            nome: '',
         });
     }
 }, { immediate: true });
 
 watch(localTurma, (newVal) => {
-    if (props.atividade) {
-        const originalTurma = { ...props.atividade };
-        isDirty.value = JSON.stringify(newVal) !== JSON.stringify(originalTurma);
+    if (props.turma) {
+        const originalTurma = { ...props.turma };
+        isDirty.value = newVal.nome !== originalTurma.nome;
     } else {
-        // Para novas tarefas, verifica se o nome foi preenchido
-        isDirty.value = !!newVal.name;
+        isDirty.value = !!newVal.nome;
     }
 }, { deep: true });
 
@@ -78,7 +66,7 @@ function saveTurma() {
             emit('close');
         } else {
             $q.notify({
-                message: 'Não pode salvar sem um nome.',
+                message: 'A turma precisa ter um nome.',
                 color: 'negative',
                 icon: 'warning',
             });
@@ -99,20 +87,20 @@ const closeModal = () => {
     if (isDirty.value) {
         $q.dialog({
             title: 'Descartar alterações?',
-            message: 'Você fez alterações. Deseja fechar sem?',
+            message: 'Você fez alterações. Deseja fechar sem salvar?',
             ok: {
                 push: true,
-                color: 'positive'
+                color: 'positive',
+                label: 'Sim'
             },
             cancel: {
                 color: 'negative',
-                push: true
+                push: true,
+                label: 'Não'
             },
             persistent: true,
         }).onOk(() => {
             emit('close');
-        }).onCancel(() => {
-            // O usuário cancelou, não faz nada
         });
     } else {
         emit('close');

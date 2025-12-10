@@ -1,15 +1,15 @@
 <template>
-  <router-link 
-    :to="props.link" 
-    custom 
+  <router-link
+    :to="props.link"
+    custom
     v-slot="{ navigate, isActive }"
   >
     <div
       class="custom-link row no-wrap items-center"
-      :class="{ 'active-link': isActive }"
+      :class="{ 'active-link': isActive || props.active }"
       @click="navigate"
     >
-      
+
       <div class="col-auto row justify-center items-center" style="width: 60px;">
         <q-icon :name="props.icon" size="sm" />
       </div>
@@ -30,7 +30,6 @@
 
 <script setup>
 
-// seu script permanece o mesmo
 const props = defineProps({
   title: {
     type: String,
@@ -51,14 +50,17 @@ const props = defineProps({
   exact: {
     type: Boolean,
     default: false,
+  },
+  active: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
 
 <style lang="scss" scoped>
-// Adicionamos estilos manuais para fazer a DIV parecer um item de menu
 .custom-link {
-  height: 48px; // Altura padrão de um item de lista
+  height: 48px;
   cursor: pointer;
   transition: background-color 0.3s;
   color: inherit;
@@ -66,12 +68,11 @@ const props = defineProps({
 }
 
 .custom-link:hover {
-  background-color: rgba(0, 0, 0, 0.04); // Efeito de hover sutil
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
-// Estilo do link ativo (quando a rota corresponde)
 .active-link {
-  color: $primary; // Usa a cor primária do Quasar
-  background-color: rgba($primary, 0.1); // Usa a cor primária com 10% de opacidade
+  color: $primary;
+  background-color: rgba($primary, 0.1);
 }
 </style>

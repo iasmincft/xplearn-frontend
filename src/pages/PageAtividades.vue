@@ -37,15 +37,6 @@
       </q-tab-panels>
     </div>
 
-    <q-page-sticky position="bottom-right" :offset="[50, 50]" v-if="userStore.isProfessor">
-      <q-btn
-        fab
-        icon="add"
-        color="accent"
-        @click="showAddAtividade = true"
-        />
-    </q-page-sticky>
-
     <q-dialog v-model="showAddAtividade">
       <AddAtividade @close="showAddAtividade = false"/>
     </q-dialog>
@@ -60,14 +51,12 @@
 import { useQuasar } from 'quasar';
 import { onMounted, ref, nextTick } from 'vue';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
-import { useUserStore } from 'src/stores/userStore';
 import { useTurmaStore } from 'src/stores/turmaStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
 
 
-const userStore = useUserStore();
 const tabAtividades = ref('pendentes');
 const atividadesStore = useAtividadesStore();
 const turmaStore = useTurmaStore();
@@ -84,7 +73,6 @@ onMounted(async() => {
 });
 
 const promptToDelete = (atividade) => {
-  // Extrai o ID se for um objeto ou usa diretamente se for um número
   const id = atividade?.id || atividade
 
   $q.dialog({

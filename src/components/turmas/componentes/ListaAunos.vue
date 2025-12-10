@@ -40,7 +40,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import { api } from 'src/boot/axios';
 
 defineProps({

@@ -1,3 +1,5 @@
+import { useUserStore } from 'src/stores/userStore'
+
 const routes = [
   {
     path: '/',
@@ -7,51 +9,59 @@ const routes = [
         path: '',
         redirect: '/auth/login'
       },
-      { 
-        path: 'home', 
+      {
+        path: 'home',
         component: () => import('src/pages/PageHome.vue'),
-        meta: { 
+        meta: {
           title: 'Home' ,
           hideHeaderElement: true
-        } 
+        }
       },
-      { 
-        path: '/atividades', 
+      {
+        path: '/atividades',
         component: () => import('src/pages/PageAtividades.vue'),
-        meta: { title: 'Atividades' }
+        meta: { title: 'Atividades' },
+        beforeEnter: (to, from, next) => {
+          const userStore = useUserStore()
+          if (userStore.currentUser?.role === 'professor') {
+            next('/home')
+          } else {
+            next()
+          }
+        }
       },
-      { 
-        path: '/ranking', 
+      {
+        path: '/ranking',
         component: () => import('src/pages/PageRanking.vue'),
         meta: { title: 'Ranking' }
       },
-      { 
-        path: '/turmas', 
+      {
+        path: '/turmas',
         component: () => import('src/pages/PageTurmas.vue'),
         meta: { title: 'Turmas' }
       },
-        { 
-          path: 'turma/:id',
+        {
+          path: 'turmas/:id',
           name: 'turmaAcessar',
           component: () => import('src/components/turmas/TurmaAcessar.vue')
         },
-      { 
-        path: '/badges', 
+      {
+        path: '/badges',
         component: () => import('src/pages/PageBadges.vue'),
         meta: { title: 'Badges' }
       },
-      { 
-        path: '/settings', 
+      {
+        path: '/settings',
         component: () => import('src/pages/PageSettings.vue'),
-        meta: { 
+        meta: {
           title: 'Settings',
           hideHeaderElement: true
-        } 
+        }
       },
       {
         path: '/auth',
         component: () => import('src/pages/PageAuth.vue'),
-        meta: { 
+        meta: {
           title: 'Auth',
           hideHeaderAuth: true
         },
@@ -73,12 +83,12 @@ const routes = [
       {
         path: '/editarUsuario',
         component: () => import('src/components/auth/user/editarUsuario.vue'),
-        meta: { 
+        meta: {
           title: 'Editar Usuário',
           hideHeaderElement: true
         }
       }
-        
+
     ]
   },
 

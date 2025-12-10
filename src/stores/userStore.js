@@ -47,7 +47,7 @@ export const useUserStore = defineStore('user', {
 
     setDados(userData) {
       if (userData) {
-
+        this.currentUser.id = userData.id || this.currentUser.id;
         this.currentUser.nome = userData.nome || this.currentUser.nome;
         this.currentUser.matricula = userData.matricula || this.currentUser.matricula;
         this.currentUser.icone = userData.icone ?? this.currentUser.icone;

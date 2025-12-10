@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-lg column no-wrap">
 
-    <div class="text-h5 q-pt-lg q-mb-md col-shrink">Ranking Geral</div>
+    <div class="text-h5 q-pt-lg q-mb-md col-shrink">Ranking</div>
 
     <div class="row justify-end items-center q-mr-xl q-mb-md">
       <RankingFilter

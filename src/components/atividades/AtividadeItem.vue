@@ -14,22 +14,63 @@
       </q-item-section>
 
       <q-item-section avatar>
-        <q-btn v-if="userStore.isProfessor" :class="{ 'bg-dark': menuAberto }" icon="more_horiz" class="text-h5" flat
-          dense size="md" />
-        <q-menu v-model="menuAberto" anchor="bottom right" self="bottom left" class="bg-dark q-pa-xs">
-          <q-item-section avatar>
-            <q-btn v-if="userStore.isProfessor" color="white" icon="visibility" class="text-h5" flat dense size="md"
-              label="Visualizar" @click.stop="$emit('view-atividade', atividade)" />
-          </q-item-section>
-          <q-item-section avatar>
-            <q-btn v-if="userStore.isProfessor" color="white" icon="edit" class="text-h5" flat dense size="md"
-              label="Editar" @click.stop="$emit('editar-atividade', atividade)" />
-          </q-item-section>
-          <q-item-section avatar>
-            <q-btn v-if="userStore.isProfessor" color="white" icon="delete" class="text-h5" flat dense size="md"
-              label="Deletar" @click.stop="$emit('deletar-atividade', atividade)" />
-          </q-item-section>
-        </q-menu>
+        <q-btn
+          v-if="userStore.isProfessor"
+          :class="{ 'bg-dark': menuAberto }"
+          icon="more_horiz"
+          class="text-h5"
+          flat
+          dense
+          size="md"
+        >
+          <q-menu
+            v-model="menuAberto"
+            anchor="bottom right"
+            self="bottom left"
+            class="bg-dark"
+            auto-close
+          >
+            <q-list style="min-width: 150px">
+
+              <q-item
+                clickable
+                v-close-popup
+                @click="$emit('view-atividade', atividade)"
+                class="text-white"
+              >
+                <q-item-section avatar>
+                  <q-icon name="visibility" />
+                </q-item-section>
+                <q-item-section>Visualizar</q-item-section>
+              </q-item>
+
+              <q-item
+                clickable
+                v-close-popup
+                @click="$emit('editar-atividade', atividade)"
+                class="text-white"
+              >
+                <q-item-section avatar>
+                  <q-icon name="edit" />
+                </q-item-section>
+                <q-item-section>Editar</q-item-section>
+              </q-item>
+
+              <q-item
+                clickable
+                v-close-popup
+                @click="$emit('deletar-atividade', atividade)"
+                class="text-white"
+              >
+                <q-item-section avatar>
+                  <q-icon name="delete" />
+                </q-item-section>
+                <q-item-section>Deletar</q-item-section>
+              </q-item>
+
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-item-section>
 
 

@@ -30,12 +30,12 @@ export const useBadgeStore = defineStore('badge', {
       }
     },
 
-    async fetchUserBadges(alunoId) {
-      if (!alunoId) return;
+    async fetchUserBadges(matricula) {
+      if (!matricula) return;
 
       this.loading = true
       try {
-        const resposta = await listBadgesDoAluno(alunoId)
+        const resposta = await listBadgesDoAluno(matricula)
         this.userItems = Array.isArray(resposta) ? resposta : []
       } catch (err) {
         console.error('Erro ao buscar badges do aluno:', err)

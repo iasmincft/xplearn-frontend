@@ -16,6 +16,7 @@
 
     <q-table
       v-else
+      ref="rankingTable"
       class="sticky-header-table"
       :rows="formattedRows"
       :columns="rankingColumns"
@@ -72,7 +73,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch, nextTick } from 'vue'
 import { useRankingStore } from 'src/stores/rankingStore'
 import { useTurmaStore } from 'src/stores/turmaStore'
 import viewAlunoRanking from 'src/components/alunoRanking/viewAlunoRanking.vue'
@@ -85,6 +86,7 @@ const showDetailsDialog = ref(false)
 const selectedStudent = ref(null)
 const selectedFilter = ref('geral')
 const loadingTurmas = ref(false)
+const rankingTable = ref(null)
 
 const rankingColumns = [
   { name: 'pos', align: 'left', label: 'POS.', field: 'pos', style: 'width: 80px; min-width: 80px' },
@@ -165,7 +167,23 @@ onMounted(async () => {
 const openStudentDetails = (row) => {
   selectedStudent.value = row
   showDetailsDialog.value = true
+}
+
+// Observa quando o dialog fecha e garante que o scroll volte ao topo
+watch(showDetailsDialog, (newValue) => {
+  if (!newValue) {
+    // Quando o dialog fecha, aguarda o próximo tick e rola para o topo
+    nextTick(() => {
+      const tableElement = rankingTable.value?.$el
+      if (tableElement) {
+        const scrollContainer = tableElement.querySelector('.q-table__middle')
+        if (scrollContainer) {
+          scrollContainer.scrollTop = 0
+        }
+      }
+    })
   }
+})
 
 </script>
 
@@ -198,8 +216,10 @@ const openStudentDetails = (row) => {
   thead tr th
     position: sticky
     z-index: 1
+    background-color: #162646
   thead tr:first-child th
     top: 0
+    background-color: #162646
 
   .q-table__middle
     max-height: inherit

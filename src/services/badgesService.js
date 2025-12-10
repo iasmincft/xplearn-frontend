@@ -8,7 +8,7 @@ export async function listBadges() {
   return data.data || data
 }
 
-export const listBadgesDoAluno = async (alunoId) => {
-    const { data } = await api.get(`/alunos/${alunoId}/badges`)
+export const listBadgesDoAluno = async (matricula) => {
+    const { data } = await api.get(`/alunos/${matricula}/badges`)
     return data
 }

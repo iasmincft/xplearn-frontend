@@ -3,7 +3,14 @@
 
     <div class="text-h5 q-pt-lg q-mb-md col-shrink">Ranking Geral</div>
 
-    <div v-if="rankingStore.loading" class="row justify-center q-pa-md">
+    <div class="row justify-end items-center q-mr-xl q-mb-md">
+      <RankingFilter
+        v-model="selectedFilter"
+        :options="filterOptions"
+      />
+    </div>
+
+    <div v-if="rankingStore.loading || loadingTurmas" class="row justify-center q-pa-md">
       <q-spinner color="primary" size="3em" />
     </div>
 
@@ -67,17 +74,40 @@
 <script setup>
 import { onMounted, computed, ref } from 'vue'
 import { useRankingStore } from 'src/stores/rankingStore'
+import { useTurmaStore } from 'src/stores/turmaStore'
 import viewAlunoRanking from 'src/components/alunoRanking/viewAlunoRanking.vue'
+import RankingFilter from 'src/components/alunoRanking/RankingFilter.vue'
 
 const rankingStore = useRankingStore()
+const turmaStore = useTurmaStore()
+
 const showDetailsDialog = ref(false)
 const selectedStudent = ref(null)
+const selectedFilter = ref('geral')
+const loadingTurmas = ref(false)
 
 const rankingColumns = [
   { name: 'pos', align: 'left', label: 'POS.', field: 'pos', style: 'width: 80px; min-width: 80px' },
   { name: 'aluno', align: 'left', label: 'ALUNO', field: 'aluno' },
   { name: 'nivel', align: 'right', label: 'NÍVEL (XP)', field: 'nivel' },
 ]
+
+const filterOptions = computed(() => {
+  const options = [
+    { label: 'Ranking Geral', value: 'geral' }
+  ]
+
+  if (turmaStore.minhasTurmas && turmaStore.minhasTurmas.length > 0) {
+    turmaStore.minhasTurmas.forEach(turma => {
+      options.push({
+        label: turma.nome || `Turma ${turma.id}`,
+        value: turma.id
+      })
+    })
+  }
+
+  return options
+})
 
 const getChipColor = (index) => {
   switch (index) {
@@ -91,7 +121,25 @@ const getChipColor = (index) => {
 const formattedRows = computed(() => {
   if (!rankingStore.items) return []
 
-  return rankingStore.items.map((item, index) => {
+  let filteredItems = rankingStore.items
+
+  if (selectedFilter.value !== 'geral') {
+    const turmaSelecionada = turmaStore.items.find(t => t.id === selectedFilter.value)
+
+    if (turmaSelecionada && turmaSelecionada.alunos) {
+      const alunosIdsDaTurma = new Set(turmaSelecionada.alunos.map(a => a.id))
+
+      filteredItems = filteredItems.filter(item => {
+        const itemId = item.id || item.matricula
+        return alunosIdsDaTurma.has(itemId)
+      })
+    } else {
+
+      filteredItems = []
+    }
+  }
+
+  return filteredItems.map((item, index) => {
     return {
       id: item.id || item.matricula,
       pos: `${index + 1}º`,
@@ -106,7 +154,12 @@ const formattedRows = computed(() => {
 })
 
 onMounted(async () => {
-  await rankingStore.fetchRanking()
+  loadingTurmas.value = true
+  await Promise.all ([
+    rankingStore.fetchRanking(),
+    turmaStore.fetchTurmas()
+  ])
+  loadingTurmas.value = false
 })
 
 const openStudentDetails = (row) => {

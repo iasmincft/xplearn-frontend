@@ -17,13 +17,12 @@ export const useTurmaStore = defineStore('turma', {
             const userStore = useUserStore()
             const user = userStore.currentUser
 
-            if (!user) return []
+            if (!user || !user.id) return []
 
             return state.items.filter(turma => {
 
-
                 if (userStore.isProfessor) {
-                    return turma.professor === user.nome
+                    return turma.professor && user.nome && turma.professor=== user.nome
                 }
 
                 if (userStore.isAluno) {

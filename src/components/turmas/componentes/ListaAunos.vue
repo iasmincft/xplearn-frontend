@@ -13,13 +13,21 @@
         <q-item-section>
           <q-item-label class="text-white text-subtitle1">{{ aluno.nome }}</q-item-label>
           <q-item-label caption class="text-grey-5">
-            @{{ aluno.nickname }}
+            @{{ aluno.nickname }} | Matrícula: {{ aluno.matricula }}
           </q-item-label>
         </q-item-section>
 
         <q-item-section side>
-          <q-btn icon="close" flat round dense color="negative" class=" q-ma-sm" v-close-popup>
-            <q-tooltip>Remover aluno</q-tooltip>
+          <q-btn 
+            icon="delete" 
+            flat 
+            round 
+            dense 
+            color="negative" 
+            class="q-ma-sm" 
+            @click="confirmarExclusao(aluno)"
+          >
+            <q-tooltip>Remover aluno da turma</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
@@ -33,6 +41,7 @@
 
 <script setup>
 import { api } from 'src/boot/axios';
+import { useQuasar } from 'quasar';
 
 defineProps({
   alunos: {
@@ -42,15 +51,34 @@ defineProps({
   }
 });
 
+const emit = defineEmits(['remover-aluno']);
+const $q = useQuasar();
 const BASE_URL_AXIOS = api.defaults.baseURL;
 
 const resolveAvatarPath = (path) => {
   if (!path) return null;
   if (path.startsWith('http')) return path;
-
   const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-
   return `${baseUrl}/static${cleanPath}`;
+};
+
+const confirmarExclusao = (aluno) => {
+  $q.dialog({
+    title: 'Remover Aluno',
+    message: `Tem certeza que deseja remover ${aluno.nome} desta turma?`,
+    persistent: true,
+    ok: {
+      label: 'Remover',
+      color: 'negative',
+      flat: true
+    },
+    cancel: {
+      label: 'Cancelar',
+      flat: true
+    }
+  }).onOk(() => {
+    emit('remover-aluno', aluno.matricula);
+  });
 };
 </script>

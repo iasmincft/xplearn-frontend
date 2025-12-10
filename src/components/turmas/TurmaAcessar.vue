@@ -45,7 +45,10 @@
           </div>
 
           <div class="col-12">
-              <ListaAlunos :alunos="alunosDaTurma" />
+              <ListaAlunos 
+                :alunos="alunosDaTurma" 
+                @remover-aluno="handleRemoverAluno"
+              />
           </div>
         </div>
 
@@ -85,8 +88,7 @@ import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import ListaAlunos from 'src/components/turmas/componentes/ListaAunos.vue';
 import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
-import AddAlunoTurma from 'src/components/turmas/modal/AddAlunoTurma.vue';
-
+import AddAlunoTurma from 'src/components/turmas/Modal/AddAlunoTurma.vue'; // Verifique se a pasta é "Modal" ou "modal"
 
 const route = useRoute();
 const turmaStore = useTurmaStore();
@@ -94,10 +96,9 @@ const atividadesStore = useAtividadesStore();
 const turmaId = Number(route.params.id);
 const $q = useQuasar();
 
-// Estados dos Modais
 const showAdicionarAtividade = ref(false);
 const showEditarAtividade = ref(false);
-const showAdicionarAluno = ref(false); // Novo estado
+const showAdicionarAluno = ref(false);
 
 const editarAtividadeRef = ref(null);
 
@@ -111,12 +112,29 @@ const atividades = computed(() => {
   return atividadesStore.atividadesPorTurma(turmaId);
 });
 
-// Função chamada quando o modal de alunos salva com sucesso
 async function atualizarTurma() {
-    // Recarrega as turmas para atualizar a lista de alunos vinculados
-    // Se a sua API tiver um endpoint específico para "getTurma(id)", seria melhor usar ele.
-    // Como o store parece carregar tudo, vamos forçar um fetch:
     await turmaStore.fetchTurmas(); 
+}
+
+// --- FUNÇÃO CORRIGIDA ABAIXO ---
+async function handleRemoverAluno(matricula) {
+  try {
+    // Removemos $q.loading para evitar erro se o plugin não estiver ativo
+    await turmaStore.removerAluno(turmaId, matricula);
+    
+    $q.notify({
+      message: 'Aluno removido com sucesso!',
+      color: 'positive',
+      icon: 'check'
+    });
+  } catch (error) {
+    console.error(error);
+    $q.notify({
+      message: 'Erro ao remover aluno: ' + (error.response?.data?.detail || error.message),
+      color: 'negative',
+      icon: 'warning'
+    });
+  } 
 }
 
 function abrirModalEdicao(atividade) {

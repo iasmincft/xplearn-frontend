@@ -61,7 +61,6 @@ export const useTurmaStore = defineStore('turma', {
       try {
         const userStore = useUserStore()
 
-        // 1. Prepara payload com a matrícula (exigido pelo Backend)
         const payload = {
           ...novaTurma,
           professor_matricula_fk: userStore.currentUser.matricula
@@ -112,11 +111,49 @@ export const useTurmaStore = defineStore('turma', {
       }
     },
 
-    async adicionarAlunos(turmaId, alunosIds) {
-      await api.post(`/turmas/${turmaId}/alunos`, {
-        alunos: alunosIds
-      });
-    }
+    async adicionarAlunos(turmaId, alunosMatriculas) {
+      try {
+        const requests = alunosMatriculas.map(matricula =>
+          api.post(`/turmas/${turmaId}/alunos/${matricula}`)
+        );
+        await Promise.all(requests);
+        await this.fetchTurmas();
+      } catch (error) {
+        console.error("Erro ao matricular alunos:", error);
+        throw error;
+      }
+    },
+    async sincronizarAlunos(turmaId, alunosParaAdicionar, alunosParaRemover) {
+      try {
+        const promises = [];
+
+        if (alunosParaAdicionar.length > 0) {
+          alunosParaAdicionar.forEach(matricula => {
+            promises.push(api.post(`/turmas/${turmaId}/alunos/${matricula}`));
+          });
+        }
+
+        if (alunosParaRemover.length > 0) {
+          alunosParaRemover.forEach(matricula => {
+            promises.push(api.delete(`/turmas/${turmaId}/alunos/${matricula}`));
+          });
+        }
+
+        await Promise.all(promises);
+
+        await this.fetchTurmas();
+
+      } catch (error) {
+        console.error("Erro ao sincronizar alunos:", error);
+        throw error;
+      }
+    },
+
+
+    async removerAluno(turmaId, matricula) {
+      await api.delete(`/turmas/${turmaId}/alunos/${matricula}`);
+      await this.fetchTurmas();
+      }
   },
 })
 

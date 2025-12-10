@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { login as authLogin, logout as authLogout, register as authRegister } from 'src/services/authService'
-import { getUserProfile } from 'src/services/userService'
+import { getUserProfile, updateUserProfile } from 'src/services/userService'
 import { useAvatarStore } from './avatarStore'
 import { api } from 'src/boot/axios'
 
@@ -130,6 +130,28 @@ export const useUserStore = defineStore('user', {
         }
       } catch (error) {
         console.error("Erro ao buscar perfil do usuário:", error)
+        throw error
+      }
+    },
+
+    async updateUserProfile(payload) {
+      try {
+        const matricula = this.currentUser.matricula
+        const role = this.currentUser.role
+        
+        if (!matricula || !role) {
+          throw new Error('Usuário não autenticado')
+        }
+
+        const updatedUserData = await updateUserProfile(matricula, role, payload)
+        
+        if (updatedUserData) {
+          this.setDados(updatedUserData)
+        }
+        
+        return updatedUserData
+      } catch (error) {
+        console.error("Erro ao atualizar perfil do usuário:", error)
         throw error
       }
     },

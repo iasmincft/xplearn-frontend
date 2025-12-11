@@ -3,7 +3,7 @@
         <q-btn to="/turmas" icon="chevron_left" flat round dense />
 
         <div class="row q-pl-xl">
-            <div class="text-h5 text-bold col">{{ turma.nome }}</div>
+            <div class="text-h4 text-bold col">{{ turma.nome }}</div>
             <div class="text-h5 col">Professor: {{ turma.professor }}</div>
         </div>
 
@@ -11,6 +11,7 @@
             <div class="col-12 row items-center justify-between q-pt-lg q-mb-md">
                 <div class="text-h5">Atividades</div>
                 <q-btn
+                  v-if="userStore.isProfessor"
                   color="primary"
                   icon="add_task"
                   label="Adicionar atividade"
@@ -37,23 +38,24 @@
             <div class="text-h5">Alunos Matriculados</div>
 
             <q-btn
+              v-if="userStore.isProfessor"
               color="primary"
               icon="person_add"
               label="Adicionar alunos"
-              @click="showAdicionarAluno = true" 
+              @click="showAdicionarAluno = true"
             />
           </div>
 
           <div class="col-12">
-              <ListaAlunos 
-                :alunos="alunosDaTurma" 
+              <ListaAlunos
+                :alunos="alunosDaTurma"
                 @remover-aluno="handleRemoverAluno"
               />
           </div>
         </div>
 
         <q-dialog v-model="showAdicionarAtividade">
-            <AddAtividade 
+            <AddAtividade
                 :turma-id="turmaId"
                 @close="showAdicionarAtividade = false"
             />
@@ -80,22 +82,23 @@
 
 <script setup>
 import { computed, onMounted, ref, nextTick } from 'vue';
+import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
 import { useTurmaStore } from 'src/stores/turmaStore';
 import { useAtividadesStore } from 'src/stores/atividadesStore';
-import { useQuasar } from 'quasar';
+import { useUserStore } from 'src/stores/userStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import ListaAlunos from 'src/components/turmas/componentes/ListaAunos.vue';
 import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
-import AddAlunoTurma from 'src/components/turmas/modal/AddAlunoTurma.vue'; 
+import AddAlunoTurma from 'src/components/turmas/modal/AddAlunoTurma.vue';
 
 const route = useRoute();
 const turmaStore = useTurmaStore();
 const atividadesStore = useAtividadesStore();
 const turmaId = Number(route.params.id);
 const $q = useQuasar();
-
+const userStore = useUserStore();
 const showAdicionarAtividade = ref(false);
 const showEditarAtividade = ref(false);
 const showAdicionarAluno = ref(false);
@@ -114,15 +117,13 @@ const atividades = computed(() => {
 });
 
 async function atualizarTurma() {
-    await turmaStore.fetchTurmas(); 
+    await turmaStore.fetchTurmas();
 }
 
-// --- FUNÇÃO CORRIGIDA ABAIXO ---
 async function handleRemoverAluno(matricula) {
   try {
-    // Removemos $q.loading para evitar erro se o plugin não estiver ativo
     await turmaStore.removerAluno(turmaId, matricula);
-    
+
     $q.notify({
       message: 'Aluno removido com sucesso!',
       color: 'positive',
@@ -135,7 +136,7 @@ async function handleRemoverAluno(matricula) {
       color: 'negative',
       icon: 'warning'
     });
-  } 
+  }
 }
 
 function abrirModalEdicao(atividade) {
@@ -159,7 +160,7 @@ function confirmarExclusao(atividade) {
     }
   }).onOk(async () => {
     try {
-        await atividadesStore.deleteAtividade(atividade.id); 
+        await atividadesStore.deleteAtividade(atividade.id);
         $q.notify({
             message: 'Atividade excluída com sucesso',
             color: 'positive',

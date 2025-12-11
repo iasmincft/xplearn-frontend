@@ -43,7 +43,8 @@ const routes = [
         {
           path: 'turmas/:id',
           name: 'turmaAcessar',
-          component: () => import('src/components/turmas/TurmaAcessar.vue')
+          component: () => import('src/components/turmas/TurmaAcessar.vue'),
+          meta: { title: 'Turmas' }
         },
       {
         path: '/badges',

@@ -18,13 +18,14 @@
         </q-item-section>
 
         <q-item-section side>
-          <q-btn 
-            icon="delete" 
-            flat 
-            round 
-            dense 
-            color="negative" 
-            class="q-ma-sm" 
+          <q-btn
+            v-if="userStore.isProfessor"
+            icon="delete"
+            flat
+            round
+            dense
+            color="negative"
+            class="q-ma-sm"
             @click="confirmarExclusao(aluno)"
           >
             <q-tooltip>Remover aluno da turma</q-tooltip>
@@ -42,6 +43,7 @@
 <script setup>
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
+import { useUserStore } from 'src/stores/userStore';
 
 defineProps({
   alunos: {
@@ -51,6 +53,7 @@ defineProps({
   }
 });
 
+const userStore = useUserStore();
 const emit = defineEmits(['remover-aluno']);
 const $q = useQuasar();
 const BASE_URL_AXIOS = api.defaults.baseURL;

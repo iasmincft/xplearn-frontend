@@ -5,7 +5,9 @@ import {
   updateAtividade as updateAtividadeService,
   deleteAtividade as deleteAtividadeService,
 } from 'src/services/atividadesService'
+import { useUserStore } from './userStore'
 import { useTurmaStore } from './turmaStore'
+import { api } from 'src/boot/axios'
 
 export const useAtividadesStore = defineStore('atividades', {
   state: () => ({
@@ -14,71 +16,80 @@ export const useAtividadesStore = defineStore('atividades', {
     error: null,
   }),
   getters: {
-    // Filtra atividades que pertencem às turmas do usuário
     minhasAtividades: (state) => {
+      const userStore = useUserStore()
       const turmaStore = useTurmaStore()
 
-      const meusTurmaIds = turmaStore.minhasTurmas.map(turma => turma.id)
+      if (userStore.isAluno) {
+        return state.items
+      }
 
+      const meusTurmaIds = turmaStore.minhasTurmas.map(turma => turma.id)
       return state.items.filter(atividade => {
         if (!atividade) return false
-        // Verifica se tem turma (objeto) ou turma_id_fk (número)
         const turmaId = atividade.turma?.id || atividade.turma_id_fk
         return turmaId && meusTurmaIds.includes(turmaId)
       })
     },
-    // Filtra atividades por data de entrega (pendentes = ainda não entregues)
+
     atividadesPendentes() {
-      const agora = new Date()
-      return this.minhasAtividades.filter(atividade => {
-        const dataEntrega = new Date(atividade.data_entrega)
-        return dataEntrega > agora
-      })
+      const userStore = useUserStore()
+
+      if (userStore.isProfessor) {
+        const agora = new Date()
+        return this.minhasAtividades.filter(a => new Date(a.data_entrega) > agora)
+      }
+
+      return this.minhasAtividades.filter(a => !a.fez_atividade)
     },
-    // Atividades com data de entrega já passada
-    atividadesVencidas() {
-      const agora = new Date()
-      return this.minhasAtividades.filter(atividade => {
-        const dataEntrega = new Date(atividade.data_entrega)
-        return dataEntrega <= agora
-      })
+
+    atividadesConcluidas() {
+      const userStore = useUserStore()
+
+      if (userStore.isProfessor) {
+        const agora = new Date()
+        return this.minhasAtividades.filter(a => new Date(a.data_entrega) <= agora)
+      }
+
+      return this.minhasAtividades.filter(a => a.fez_atividade)
     },
-    // Filtra por turma
-    atividadesPorTurma: (state) => {
-      return (turmaId) => {
+
+    verificarAtraso: () => (atividade) => {
+      if (!atividade.data_entrega) return false
+      if (atividade.fez_atividade) return false
+
+      const agora = new Date()
+      const entrega = new Date(atividade.data_entrega)
+      return entrega < agora
+    },
+
+    atividadesPorTurma: (state) => (turmaId) => {
         if (!turmaId) return []
-        // Converte turmaId para número para comparação consistente
         const turmaIdNum = Number(turmaId)
         return state.items.filter(a => {
           if (!a) return false
-          // O backend retorna turma_id_fk como número
-          // Mas pode ter turma como objeto em alguns casos (quando carregado com relacionamento)
           const atividadeTurmaId = a.turma?.id || a.turma_id_fk
-          // Compara convertendo ambos para número
           return Number(atividadeTurmaId) === turmaIdNum
         })
-      }
-    },
-    // Filtra por badge
-    atividadesPorBadge: (state) => {
-      return (badgeId) => state.items.filter(a => {
-        if (!a) return false
-        // O backend retorna badge_id_fk como número
-        // Mas pode ter badge como objeto em alguns casos (quando carregado com relacionamento)
-        const atividadeBadgeId = a.badge?.id || a.badge_id_fk
-        return atividadeBadgeId === badgeId
-      })
     }
   },
   actions: {
     async fetchAtividades() {
       this.loading = true
       this.error = null
+      const userStore = useUserStore()
+
       try {
-        const data = await listAtividades()
-        this.items = data
+        if (userStore.isAluno) {
+            const matricula = userStore.currentUser.matricula
+            const response = await api.get(`/alunos/${matricula}/atividades`)
+            this.items = response.data
+        } else {
+            const data = await listAtividades()
+            this.items = data
+        }
       } catch (err) {
-        this.error = 'Falha ao buscar atividades da API.'
+        this.error = 'Falha ao buscar atividades.'
         console.error('Erro ao buscar atividades:', err)
       } finally {
         this.loading = false
@@ -86,51 +97,21 @@ export const useAtividadesStore = defineStore('atividades', {
     },
 
     async addAtividade(novaAtividade) {
-      try {
-        const created = await createAtividade(novaAtividade)
-        this.items.unshift(created)
-      } catch (err) {
-        this.error = 'Falha ao adicionar atividade.'
-        console.error('Erro ao adicionar atividade:', err)
-        throw err;
-      }
+      const created = await createAtividade(novaAtividade)
+      this.items.unshift(created)
     },
 
     async updateAtividade(atividadeAtualizada) {
-      try {
-        // Encontra o item original para garantir que o ID é válido
-        const index = this.items.findIndex(item => item.id === atividadeAtualizada.id)
-
-        if (index === -1) {
-          throw new Error("Atividade não encontrada localmente.")
-        }
-
-        // PUT ou PATCH via service
-        const updated = await updateAtividadeService(atividadeAtualizada)
-
-        // Atualiza o estado local após o sucesso do backend
-        this.items[index] = updated ?? atividadeAtualizada
-
-      } catch (err) {
-        this.error = 'Falha ao atualizar atividade.'
-        console.error('Erro ao atualizar atividade:', err)
-        throw err;
+      const index = this.items.findIndex(item => item.id === atividadeAtualizada.id)
+      if (index !== -1) {
+          const updated = await updateAtividadeService(atividadeAtualizada)
+          this.items[index] = updated ?? atividadeAtualizada
       }
     },
 
-    async deleteAtividade(idParaDeletar) {
-      try {
-        // DELETE via service
-        await deleteAtividadeService(idParaDeletar)
-
-        // Remove do estado local após o sucesso do backend
-        this.items = this.items.filter(item => item.id !== idParaDeletar)
-
-      } catch (err) {
-        this.error = 'Falha ao deletar atividade.'
-        console.error('Erro ao deletar atividade:', err)
-        throw err;
-      }
+    async deleteAtividade(id) {
+      await deleteAtividadeService(id)
+      this.items = this.items.filter(item => item.id !== id)
     },
   },
 })

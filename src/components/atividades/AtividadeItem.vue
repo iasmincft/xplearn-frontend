@@ -8,7 +8,18 @@
       </q-item-section>
 
       <q-item-section>
-        <q-item-label>{{ atividade.nome }}</q-item-label>
+        <q-item-label class="row items-center">
+          {{ atividade.nome }}
+
+          <q-chip
+            v-if="isAtrasada(atividade)"
+            text-color="negative"
+            style="background-color: #ffcdd2;"
+            size="sm"
+            label="Atrasada"
+            class="q-ml-md "
+          />
+        </q-item-label>
 
         <q-item-label v-if="!hideTurma && atividade.turma" class="q-pl-md">
           {{ atividade.turma.nome }}
@@ -99,7 +110,6 @@ import { api } from 'src/boot/axios';
 const router = useRouter();
 const userStore = useUserStore();
 
-// ALTERAÇÃO 2: Adicionada a prop hideTurma
 const props = defineProps({
   atividade: {
     type: Object,
@@ -114,15 +124,25 @@ const props = defineProps({
 const menuAberto = ref(false);
 const emit = defineEmits(['view-atividade', 'editar-atividade', 'deletar-atividade'])
 
+function isAtrasada(atividade) {
+  if (atividade.fez_atividade) return false;
+
+  if (!atividade.data_entrega) return false;
+
+  const dataEntrega = new Date(atividade.data_entrega);
+  const hoje = new Date();
+
+  return dataEntrega < hoje;
+}
+
 function handleViewAtividade() {
   const atividadeId = props.atividade?.id || props.atividade;
   if (atividadeId) {
-    menuAberto.value = false // Fecha o menu manualmente
+    menuAberto.value = false
     router.push({ name: 'atividadeDetalhes', params: { id: atividadeId } }).catch(err => {
       console.error('Erro ao navegar:', err);
     });
   }
-  // Também emite o evento para compatibilidade
   emit('view-atividade', props.atividade)
 }
 

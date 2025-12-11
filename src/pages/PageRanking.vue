@@ -35,6 +35,7 @@
         <q-tr
           :props="props"
           @click="openStudentDetails(props.row)"
+          class="cursor-pointer"
           >
 
           <q-td key="pos" :props="props" style="width: 80px; min-width: 80px;">
@@ -62,7 +63,7 @@
     </q-table>
 
     <div v-if="!rankingStore.loading && rankingStore.items.length === 0" class="text-center text-grey q-mt-md">
-      Nenhum aluno no ranking ainda.
+      Nenhum aluno encontrado neste ranking.
     </div>
 
     <q-dialog v-model="showDetailsDialog">
@@ -120,28 +121,18 @@ const getChipColor = (index) => {
   }
 }
 
+// CORREÇÃO 1: Watch para disparar a busca na API quando o filtro mudar
+watch(selectedFilter, async (newFilter) => {
+  // Isso chama a action da Store, que chama o Service, que chama a API com ?turma_id=...
+  await rankingStore.fetchRanking(newFilter)
+})
+
+// CORREÇÃO 2: Simplificação do computed. Não filtramos mais manualmente.
 const formattedRows = computed(() => {
+  // A store já contém a lista filtrada vinda do backend
   if (!rankingStore.items) return []
 
-  let filteredItems = rankingStore.items
-
-  if (selectedFilter.value !== 'geral') {
-    const turmaSelecionada = turmaStore.items.find(t => t.id === selectedFilter.value)
-
-    if (turmaSelecionada && turmaSelecionada.alunos) {
-      const alunosIdsDaTurma = new Set(turmaSelecionada.alunos.map(a => a.id))
-
-      filteredItems = filteredItems.filter(item => {
-        const itemId = item.id || item.matricula
-        return alunosIdsDaTurma.has(itemId)
-      })
-    } else {
-
-      filteredItems = []
-    }
-  }
-
-  return filteredItems.map((item, index) => {
+  return rankingStore.items.map((item, index) => {
     return {
       id: item.id || item.matricula,
       pos: `${index + 1}º`,
@@ -158,7 +149,7 @@ const formattedRows = computed(() => {
 onMounted(async () => {
   loadingTurmas.value = true
   await Promise.all ([
-    rankingStore.fetchRanking(),
+    rankingStore.fetchRanking('geral'), // Garante carregamento inicial
     turmaStore.fetchTurmas()
   ])
   loadingTurmas.value = false
@@ -169,10 +160,8 @@ const openStudentDetails = (row) => {
   showDetailsDialog.value = true
 }
 
-// Observa quando o dialog fecha e garante que o scroll volte ao topo
 watch(showDetailsDialog, (newValue) => {
   if (!newValue) {
-    // Quando o dialog fecha, aguarda o próximo tick e rola para o topo
     nextTick(() => {
       const tableElement = rankingTable.value?.$el
       if (tableElement) {
@@ -188,6 +177,7 @@ watch(showDetailsDialog, (newValue) => {
 </script>
 
 <style lang="sass">
+/* Seu estilo permanece o mesmo */
 .sticky-header-table
   height: 530px
   max-height: calc(100vh - 200px)
@@ -204,7 +194,6 @@ watch(showDetailsDialog, (newValue) => {
     border-radius: 9px
     opacity: 0.2
 
-  /* Remove padding padrão do rodapé do Quasar */
   .q-table__bottom
     padding: 0
     border-top: none

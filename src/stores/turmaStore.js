@@ -20,31 +20,38 @@ export const useTurmaStore = defineStore('turma', {
 
       if (!user) return []
 
-      return state.items.filter(turma => {
+      if (userStore.isAluno) {
+        return state.items
+      }
 
-        if (userStore.isProfessor) {
+      if (userStore.isProfessor) {
+        return state.items.filter(turma => {
           const matriculaMatch = turma.professor_matricula_fk && user.matricula && String(turma.professor_matricula_fk) === String(user.matricula);
           const nomeMatch = turma.professor && user.nome && turma.professor === user.nome;
           return matriculaMatch || nomeMatch;
-        }
+        })
+      }
 
-        if (userStore.isAluno) {
-          if (turma.alunos && Array.isArray(turma.alunos)) {
-            return turma.alunos.some(aluno => aluno.id === user.id)
-          }
-          return false
-        }
-
-        return false
-      })
+      return state.items
     }
   },
   actions: {
     async fetchTurmas() {
       this.loading = true
       this.error = null
+      const userStore = useUserStore()
+
       try {
-        this.items = await listTurmas()
+        if (userStore.isAluno) {
+          const matricula = userStore.currentUser.matricula
+          if (matricula) {
+            const response = await api.get(`/alunos/${matricula}/turmas`)
+            this.items = response.data.data || response.data || []
+          }
+        } else {
+          this.items = await listTurmas()
+        }
+
       } catch (err) {
         this.error = 'Falha ao buscar turmas da API.'
         console.error('Erro ao buscar turmas:', err)
@@ -71,10 +78,10 @@ export const useTurmaStore = defineStore('turma', {
         if (!created.professor_matricula_fk) {
           created.professor_matricula_fk = userStore.currentUser.matricula
         }
-
         if (!created.professor) {
           created.professor = userStore.currentUser.nome
         }
+
         this.items.unshift(created)
 
       } catch (err) {
@@ -88,7 +95,8 @@ export const useTurmaStore = defineStore('turma', {
       try {
         const index = this.items.findIndex(item => item.id === turmaAtualizada.id)
         if (index === -1) {
-          throw new Error("Turma não encontrada localmente.")
+          await updateTurma(turmaAtualizada)
+          return
         }
         const updated = await updateTurma(turmaAtualizada)
         const merged = { ...this.items[index], ...(updated ?? turmaAtualizada) }
@@ -123,6 +131,7 @@ export const useTurmaStore = defineStore('turma', {
         throw error;
       }
     },
+
     async sincronizarAlunos(turmaId, alunosParaAdicionar, alunosParaRemover) {
       try {
         const promises = [];
@@ -140,7 +149,6 @@ export const useTurmaStore = defineStore('turma', {
         }
 
         await Promise.all(promises);
-
         await this.fetchTurmas();
 
       } catch (error) {
@@ -149,15 +157,13 @@ export const useTurmaStore = defineStore('turma', {
       }
     },
 
-
     async removerAluno(turmaId, matricula) {
       await api.delete(`/turmas/${turmaId}/alunos/${matricula}`);
       await this.fetchTurmas();
-      }
+    }
   },
 })
 
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useTurmaStore, import.meta.hot))
 }
-

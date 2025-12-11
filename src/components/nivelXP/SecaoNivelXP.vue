@@ -1,14 +1,22 @@
 <template>
     <div class="row items-center q-gutter-sm">
         <div class="text-subtitle1">Nível {{ userStore.currentUser.nivel }}</div>
+
         <q-linear-progress
             rounded
             size="15px"
             :value="progress"
             color="primary"
             class="q-mt-sm col"
-        />
-        <div class="text-right text-caption text-grey-5 q-mt-xs">{{userStore.currentUser.xp}}/1000 XP</div>
+        >
+            <q-tooltip>
+                {{ xpNoNivelAtual }} / {{ XP_POR_NIVEL }} XP neste nível
+            </q-tooltip>
+        </q-linear-progress>
+
+        <div class="text-right text-caption text-grey-5 q-mt-xs">
+            {{ xpNoNivelAtual }}/{{ XP_POR_NIVEL }} XP
+        </div>
     </div>
 </template>
 
@@ -17,11 +25,15 @@ import { useUserStore } from 'src/stores/userStore';
 import { computed } from 'vue';
 
 const userStore = useUserStore();
+const XP_POR_NIVEL = 1000; 
+
+const xpNoNivelAtual = computed(() => {
+    const totalXp = Number(userStore.currentUser.xp) || 0;
+    return totalXp % XP_POR_NIVEL;
+});
+
 const progress = computed(() => {
-    const currentXp = Number(userStore.currentUser.xp) || 0;
-
-    if (currentXp === 0) return 0;
-
-    return Math.min(currentXp / 1000, 1);
+    if (xpNoNivelAtual.value === 0) return 0;
+    return xpNoNivelAtual.value / XP_POR_NIVEL;
 });
 </script>

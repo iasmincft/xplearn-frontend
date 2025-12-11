@@ -92,7 +92,7 @@ const routes = [
       {
         path: '/atividades/:id',
         name: 'atividadeDetalhes',
-        component: () => import('src/pages/PageAtividadeDetalhes.vue'),
+        component: () => import('src/components/atividades/AtividadeDetalhes.vue'),
         meta: {
           title: 'Detalhes da Atividade'
         }

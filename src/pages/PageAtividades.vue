@@ -7,24 +7,31 @@
 
     <div class="col relative-position q-mt-md">
       <q-tab-panels v-model="tabAtividades" animated class="bg-transparent absolute-full">
+
         <q-tab-panel name="pendentes" class="q-pa-none">
           <q-scroll-area class="fit q-pa-md">
-            <AtividadeLista v-if="atividadesStore.atividadesPendentes && atividadesStore.atividadesPendentes.length > 0"
-              :atividades="atividadesStore.atividadesPendentes" @editar-atividade="abrirModalEdicao"
-              @deletar-atividade="promptToDelete" />
+            <AtividadeLista
+              v-if="atividadesStore.atividadesPendentes && atividadesStore.atividadesPendentes.length > 0"
+              :atividades="atividadesStore.atividadesPendentes"
+              @editar-atividade="abrirModalEdicao"
+              @deletar-atividade="promptToDelete"
+            />
             <div v-else class="fit flex flex-center text-center column">
-              <div class="text-grey-5 q-mt-md">Nada por aqui.</div>
+              <div class="text-grey-5 q-mt-md">Nenhuma atividade pendente.</div>
             </div>
           </q-scroll-area>
         </q-tab-panel>
 
         <q-tab-panel name="concluidas" class="q-pa-none">
           <q-scroll-area class="fit q-pa-md">
-            <AtividadeLista v-if="atividadesStore.atividadesVencidas && atividadesStore.atividadesVencidas.length > 0"
-              :atividades="atividadesStore.atividadesVencidas" @editar-atividade="abrirModalEdicao"
-              @deletar-atividade="promptToDelete" />
+            <AtividadeLista
+              v-if="atividadesStore.atividadesConcluidas && atividadesStore.atividadesConcluidas.length > 0"
+              :atividades="atividadesStore.atividadesConcluidas"
+              @editar-atividade="abrirModalEdicao"
+              @deletar-atividade="promptToDelete"
+            />
             <div v-else class="fit flex flex-center text-center column">
-              <div class="text-grey-5 q-mt-md">Nada por aqui.</div>
+              <div class="text-grey-5 q-mt-md">Nenhuma atividade concluída ainda.</div>
             </div>
           </q-scroll-area>
         </q-tab-panel>
@@ -49,6 +56,7 @@ import { useTurmaStore } from 'src/stores/turmaStore';
 import AtividadeLista from 'src/components/atividades/AtividadeLista.vue';
 import AddAtividade from 'src/components/atividades/Modal/AddAtividade.vue';
 import EditarAtividade from 'src/components/atividades/Modal/EditarAtividade.vue';
+
 const tabAtividades = ref('pendentes');
 const atividadesStore = useAtividadesStore();
 const turmaStore = useTurmaStore();
@@ -58,6 +66,7 @@ const showEditarAtividade = ref(false);
 const editarAtividadeRef = ref(null);
 
 onMounted(async () => {
+  // Carrega ambas as stores para garantir filtros corretos
   await Promise.all([
     atividadesStore.fetchAtividades(),
     turmaStore.fetchTurmas()
@@ -96,8 +105,6 @@ const promptToDelete = (atividade) => {
         icon: 'error'
       });
     }
-  }).onCancel(() => {
-    // Não precisa notificar quando cancela
   });
 };
 

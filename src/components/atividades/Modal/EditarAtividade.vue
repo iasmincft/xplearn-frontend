@@ -32,19 +32,21 @@ async function handleUpdate(dadosDoFormulario) {
         dadosDoFormulario.id = editarAtividade.value.id;
     }
 
-    if (props.hideTurma && editarAtividade.value?.turma) {
+    if (dadosDoFormulario.turma && typeof dadosDoFormulario.turma === 'object') {
+        dadosDoFormulario.turma_id_fk = dadosDoFormulario.turma.id;
+    }
 
+    if (dadosDoFormulario.badge && typeof dadosDoFormulario.badge === 'object') {
+        dadosDoFormulario.badge_id = dadosDoFormulario.badge.id;
+    }
+    if (props.hideTurma && editarAtividade.value?.turma) {
         if (!dadosDoFormulario.turma_id_fk) {
             dadosDoFormulario.turma_id_fk = editarAtividade.value.turma.id;
         }
-
-        if (!dadosDoFormulario.turma) {
-            dadosDoFormulario.turma = editarAtividade.value.turma;
-        }
+        // ...
     }
 
     try {
-
         await atividadesStore.updateAtividade(dadosDoFormulario);
 
         $q.notify({
@@ -55,8 +57,10 @@ async function handleUpdate(dadosDoFormulario) {
         emit('close');
     } catch (error) {
         console.error('Erro no update:', error);
+        console.log('Detalhes do erro:', error.response?.data);
+
         $q.notify({
-            message: 'Erro ao atualizar: ' + (error.message || 'Verifique o console'),
+            message: 'Erro ao atualizar: ' + (error.response?.data?.detail || error.message || 'Erro desconhecido'),
             color: 'negative',
             icon: 'error'
         });

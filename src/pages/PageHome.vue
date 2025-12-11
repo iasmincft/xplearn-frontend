@@ -1,4 +1,3 @@
-
 <template>
   <q-page padding class="q-ma-lg">
     <div class="q-pa-md">
@@ -13,62 +12,60 @@
             </q-avatar>
             <div class="q-ml-lg">
               <div class="text-h4">{{ userStore.currentUser?.nome }}</div>
-              <div
-              class="text-grey-5"
-              v-if="userStore.currentUser?.nickname"
-              >@{{userStore.currentUser?.nickname }}</div>
+              <div class="text-grey-5" v-if="userStore.currentUser?.nickname">
+                @{{ userStore.currentUser?.nickname }}
+              </div>
             </div>
             <q-space />
             <div class="col-xs-12 col-sm-5 q-pr-lg">
-              <SecaoNivelXP
-                v-if="userStore.isAluno"
-              />
+              <SecaoNivelXP v-if="userStore.isAluno" />
             </div>
           </div>
         </q-card-section>
       </q-card>
 
       <div class="row q-col-gutter-xl">
-
         <div class="col-12 col-md-7">
 
           <div v-if="userStore.isAluno" style="width: fit-content;">
             <div class="text-h5 q-pt-xl q-mb-md">Atividades</div>
-              <q-card rounded class="bg-dark-page q-pa-sm" style="width: fit-content;" flat >
-                <q-list>
-                  <router-link
-                    style="text-decoration: none;"
-                    :to="{ path: '/atividades', query: { tab: 'pendentes' } }"
-                  >
-                    <q-item class="bgdark">
-                      <q-chip clickable class="bg-dark text-white" style="width: 190px;">
-                        <span class="q-pr-lg ">Atividades Pendentes:</span>
-                        <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
-                          {{atividadesStore.atividadesPendentes.length}}
-                        </q-avatar>
-                      </q-chip>
-                    </q-item>
-                  </router-link>
-                  <router-link
-                    style="text-decoration: none;"
-                    :to="{ path: '/atividades', query: { tab: 'concluidas' } }"
-                  >
-                    <q-item>
-                      <q-chip clickable class="bg-dark text-white" style="width: 190px;">
-                        <span class="q-pr-lg ">Atividades Concluídas:</span>
-                        <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
-                          {{atividadesStore.atividadesVencidas.length}}
-                        </q-avatar>
-                      </q-chip>
-                    </q-item>
-                  </router-link>
-                </q-list>
-              </q-card>
-            </div>
-            <div v-if="userStore.isProfessor">
+            <q-card rounded class="bg-dark-page q-pa-sm" style="width: fit-content;" flat>
+              <q-list>
+                <router-link
+                  style="text-decoration: none;"
+                  :to="{ path: '/atividades', query: { tab: 'pendentes' } }"
+                >
+                  <q-item class="bgdark">
+                    <q-chip clickable class="bg-dark text-white" style="width: 190px;">
+                      <span class="q-pr-lg">Atividades Pendentes:</span>
+                      <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
+                        {{ atividadesStore.atividadesPendentes?.length || 0 }}
+                      </q-avatar>
+                    </q-chip>
+                  </q-item>
+                </router-link>
+
+                <router-link
+                  style="text-decoration: none;"
+                  :to="{ path: '/atividades', query: { tab: 'concluidas' } }"
+                >
+                  <q-item>
+                    <q-chip clickable class="bg-dark text-white" style="width: 190px;">
+                      <span class="q-pr-lg">Atividades Concluídas:</span>
+                      <q-avatar class="q-ml-md" color="secondary" text-color="white" size="24px">
+                        {{ atividadesStore.atividadesConcluidas?.length || 0 }}
+                      </q-avatar>
+                    </q-chip>
+                  </q-item>
+                </router-link>
+              </q-list>
+            </q-card>
+          </div>
+
+          <div v-if="userStore.isProfessor">
             <div class="text-h5 q-pt-xl q-mb-md">Turmas</div>
 
-            <div v-if="turmaStore.minhasTurmas.length === 0" class="column  q-pa-md">
+            <div v-if="!turmaStore.minhasTurmas || turmaStore.minhasTurmas.length === 0" class="column q-pa-md">
               <div class="text-grey-5 q-mb-md">Você ainda não tem turmas.</div>
               <q-btn
                 color="primary"
@@ -86,17 +83,13 @@
               />
             </div>
           </div>
+
           <div style="width: fit-content;" v-if="userStore.isAluno">
             <div class="text-h5 q-mb-md q-pt-xl">Badges</div>
             <div class="row q-gutter-md">
-              <div
-                v-for="index in slotsVisiveis"
-                :key="`home-slot-${index}`"
-              >
+              <div v-for="index in slotsVisiveis" :key="`home-slot-${index}`">
                 <q-avatar size="90px">
-                  <q-img
-                    :src="getBadgeImage(index - 1)"
-                  >
+                  <q-img :src="getBadgeImage(index - 1)">
                     <q-tooltip>
                       {{ getBadgeName(index - 1) }}
                     </q-tooltip>
@@ -108,7 +101,6 @@
         </div>
 
         <div class="col-12 col-md-5">
-
           <div v-if="userStore.isAluno">
             <RankingTurma />
           </div>
@@ -143,20 +135,20 @@ const BASE_URL_AXIOS = api.defaults.baseURL;
 
 const getBadgeImage = (index) => {
   const badge = badgeStore.userItems && badgeStore.userItems[index];
-  
+
   if (!badge || !badge.caminho_foto) {
     return emptySlotImage;
   }
-  
+
   const pathDoBanco = badge.caminho_foto;
-  
+
   if (pathDoBanco.startsWith('http')) {
     return pathDoBanco;
   }
-  
+
   const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS;
   const path = pathDoBanco.startsWith('/') ? pathDoBanco : `/${pathDoBanco}`;
-  
+
   return `${baseUrl}/static${path}`;
 };
 
@@ -167,11 +159,15 @@ const getBadgeName = (index) => {
 
 onMounted(async () => {
   const promises = [];
-  
+
   if (userStore.isAluno && userStore.currentUser?.matricula) {
     promises.push(badgeStore.fetchUserBadges(userStore.currentUser.matricula));
+    promises.push(atividadesStore.fetchAtividades());
+    promises.push(turmaStore.fetchTurmas());
+  } else if (userStore.isProfessor) {
+    promises.push(turmaStore.fetchTurmas());
   }
-  
+
   await Promise.all(promises);
 });
 

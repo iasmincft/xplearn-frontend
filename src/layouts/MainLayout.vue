@@ -63,9 +63,9 @@
                       class="text-white "
                     >
                       <q-item-section avatar>
-                        <q-icon name="delete" />
+                        <q-icon name="logout" />
                       </q-item-section>
-                      <q-item-section>Sair</q-item-section>
+                      <q-item-section>Logout</q-item-section>
                     </q-item>
 
                   </q-list>

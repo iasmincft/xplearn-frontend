@@ -167,19 +167,28 @@ onMounted(async () => {
   }
 
   try {
-    await Promise.all([
-      carregarAtividade(atividadeId),
-      carregarAlunos(atividadeId)
-    ])
+    await carregarAtividade(atividadeId)
   } catch (error) {
-    console.error('Erro ao carregar dados:', error)
-    const errorMessage = error?.response?.data?.detail || error?.message || 'Erro desconhecido'
-    console.error('Detalhes do erro:', error.response?.data)
+    console.error('Erro fatal ao carregar atividade:', error)
     $q.notify({
-      message: `Erro ao carregar dados da atividade: ${errorMessage}`,
+      message: 'Não foi possível carregar os detalhes da atividade.',
       color: 'negative',
-      icon: 'error',
-      timeout: 5000
+      icon: 'error'
+    })
+    loading.value = false
+    return
+  }
+
+  try {
+    await carregarAlunos(atividadeId)
+  } catch (error) {
+    console.error('Erro ao carregar lista de alunos (Erro 500 esperado se for backend):', error)
+    $q.notify({
+      message: 'Erro ao carregar a lista de alunos da turma.',
+      caption: 'Verifique o console do servidor para detalhes do erro 500.',
+      color: 'warning',
+      icon: 'warning',
+      timeout: 4000
     })
   } finally {
     loading.value = false
@@ -187,24 +196,15 @@ onMounted(async () => {
 })
 
 async function carregarAtividade(id) {
-  try {
-    atividade.value = await getAtividadeById(id)
-  } catch (error) {
-    console.error('Erro ao carregar atividade:', error)
-    console.error('Response:', error.response?.data)
-    throw error
+  const data = await getAtividadeById(id)
+  if (data) {
+    atividade.value = data
   }
 }
 
 async function carregarAlunos(id) {
-  try {
-    const response = await getAlunosAtividade(id)
-    alunos.value = response.alunos || []
-  } catch (error) {
-    console.error('Erro ao carregar alunos:', error)
-    console.error('Response:', error.response?.data)
-    throw error
-  }
+  const response = await getAlunosAtividade(id)
+  alunos.value = response.alunos || []
 }
 
 async function toggleAlunoFezAtividade(aluno) {
@@ -213,7 +213,6 @@ async function toggleAlunoFezAtividade(aluno) {
 
   try {
     if (estavaMarcado) {
-      // Desmarcar - remove o registro (e a nota)
       await desmarcarAlunoFezAtividade(atividadeId, aluno.matricula)
       aluno.fez_atividade = false
       aluno.nota = null
@@ -221,10 +220,10 @@ async function toggleAlunoFezAtividade(aluno) {
         message: `${aluno.nome} desmarcado da atividade`,
         color: 'info',
         icon: 'info',
-        position: 'top'
+        position: 'top',
+        timeout: 1000
       })
     } else {
-      // Marcar - cria registro com nota "0"
       await marcarAlunoFezAtividade(atividadeId, aluno.matricula, '0')
       aluno.fez_atividade = true
       aluno.nota = '0'
@@ -232,7 +231,8 @@ async function toggleAlunoFezAtividade(aluno) {
         message: `${aluno.nome} marcado como tendo feito a atividade`,
         color: 'positive',
         icon: 'check',
-        position: 'top'
+        position: 'top',
+        timeout: 1000
       })
     }
   } catch (error) {
@@ -242,7 +242,6 @@ async function toggleAlunoFezAtividade(aluno) {
       color: 'negative',
       icon: 'error'
     })
-    // Reverter mudança visual em caso de erro
     aluno.fez_atividade = estavaMarcado
   }
 }
@@ -252,51 +251,36 @@ async function atualizarNotaAluno(aluno) {
   const notaAnterior = aluno.nota
 
   try {
-    // Converte para número e valida
     const notaNum = parseFloat(aluno.nota) || 0
     const notaMax = parseFloat(atividade.value?.nota_max) || 10
-    
-    // Validação no frontend
+
     if (notaNum < 0) {
       aluno.nota = notaAnterior
-      $q.notify({
-        message: 'A nota não pode ser menor que 0',
-        color: 'negative',
-        icon: 'error',
-        position: 'top'
-      })
+      $q.notify({ message: 'A nota não pode ser menor que 0', color: 'negative', icon: 'error', position: 'top' })
       return
     }
-    
+
     if (notaNum > notaMax) {
       aluno.nota = notaAnterior
-      $q.notify({
-        message: `A nota não pode ser maior que ${notaMax}`,
-        color: 'negative',
-        icon: 'error',
-        position: 'top'
-      })
+      $q.notify({ message: `A nota não pode ser maior que ${notaMax}`, color: 'negative', icon: 'error', position: 'top' })
       return
     }
-    
+
     const nota = String(notaNum)
-    
     await atualizarNotaAlunoService(atividadeId, aluno.matricula, nota)
-    
+
     $q.notify({
-      message: `Nota de ${aluno.nome} atualizada para ${nota}`,
+      message: `Nota de ${aluno.nome} atualizada`,
       color: 'positive',
       icon: 'check',
       position: 'top',
-      timeout: 2000
+      timeout: 1000
     })
   } catch (error) {
-    console.error('Erro ao atualizar nota do aluno:', error)
-    // Reverter valor em caso de erro
+    console.error('Erro ao atualizar nota:', error)
     aluno.nota = notaAnterior
-    const errorMessage = error?.response?.data?.detail || error?.message || 'Erro ao atualizar nota do aluno'
     $q.notify({
-      message: errorMessage,
+      message: error?.response?.data?.detail || 'Erro ao atualizar nota',
       color: 'negative',
       icon: 'error'
     })
@@ -307,38 +291,26 @@ function formatDate(dateString) {
   if (!dateString) return 'Não definida'
   const date = new Date(dateString)
   return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
   })
 }
 
 function getBadgeSrc(badge) {
   if (!badge || !badge.caminho_foto) return ''
-
   const pathDoBanco = badge.caminho_foto
-
   if (pathDoBanco.startsWith('http')) return pathDoBanco
-
   const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS
   const path = pathDoBanco.startsWith('/') ? pathDoBanco : `/${pathDoBanco}`
-
   return `${baseUrl}/static${path}`
 }
 
 function getAvatarSrc(avatar) {
   if (!avatar || !avatar.caminho_foto) return ''
-
   const pathDoBanco = avatar.caminho_foto
-
   if (pathDoBanco.startsWith('http')) return pathDoBanco
-
   const baseUrl = BASE_URL_AXIOS.endsWith('/') ? BASE_URL_AXIOS.slice(0, -1) : BASE_URL_AXIOS
   const path = pathDoBanco.startsWith('/') ? pathDoBanco : `/${pathDoBanco}`
-
   return `${baseUrl}/static${path}`
 }
 </script>
-
